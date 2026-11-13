@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multirubro Expres | Tienda Mayorista y Minorista</title>
+    <meta
+      name="description"
+      content="Multirubro Expres (MR Expres) — Indumentaria básica, sublimación, electrónica, hogar, bazar y más. Precios mayoristas y minoristas con envíos a todo el país."
+    />
+    <link rel="icon" type="image/png" href="/images/logo-mr-expres.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <!-- Barra de anuncios superior (estilo Danina / Royalty) -->
+    <div class="announcement-bar">
+      <div class="container announcement-inner">
+        <span>🚚 <strong>Envíos a todo el país</strong> · Despacho en 24 hs</span>
+        <span class="announcement-sep" aria-hidden="true">|</span>
+        <span>🏷️ <strong>Precios Mayoristas</strong> llevando 3+ unidades</span>
+        <span class="announcement-sep" aria-hidden="true">|</span>
+        <span>💬 Atención directa por <strong>WhatsApp</strong></span>
+      </div>
+    </div>
+
+    <!-- Header Principal (estructura de la captura + responsive) -->
+    <header class="site-header" id="site-header">
+      <div class="header-top">
+        <div class="container header-top-inner">
+          <div class="header-brand-group">
+            <button
+              id="drawer-open"
+              class="icon-btn mobile-menu-btn"
+              type="button"
+              aria-label="Abrir menú y categorías"
+              aria-expanded="false"
+              aria-controls="mobile-drawer"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+
+            <a href="#inicio" class="brand-logo" aria-label="Multirubro Expres - Inicio">
+              <img
+                src="/images/logo-mr-expres.png"
+                alt="Logo MR Expres Multirubro Expres"
+                width="140"
+                height="56"
+                fetchpriority="high"
+              />
+            </a>
+          </div>
+
+          <!-- Buscador central con selector de categoría -->
+          <form class="header-search" id="search-form" role="search" aria-label="Buscar productos">
+            <label class="visually-hidden" for="search-input">Buscar productos</label>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Buscar remeras, termos, auriculares, insumos..."
+              autocomplete="off"
+            />
+            <label class="visually-hidden" for="search-category">Filtrar por categoría</label>
+            <select id="search-category" aria-label="Categoría">
+              <option value="all">Todas las categorías</option>
+            </select>
+            <button type="submit" class="search-submit" aria-label="Buscar">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+          </form>
+
+          <!-- Acciones derechas: Favoritos, Carrito, Instagram -->
+          <div class="header-actions">
+            <button
+              type="button"
+              class="action-circle-btn"
+              id="wishlist-filter-btn"
+              aria-label="Ver favoritos"
+              title="Favoritos"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <span class="action-badge" id="wishlist-count">0</span>
+            </button>
+
+            <button
+              type="button"
+              class="action-circle-btn"
+              id="cart-open-btn"
+              aria-label="Abrir carrito de compras"
+              aria-controls="cart-drawer"
+              aria-expanded="false"
+              title="Carrito"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+              <span class="action-badge" id="cart-count">0</span>
+            </button>
+
+            <a
+              href="https://www.instagram.com/multirubroexpres/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="action-circle-btn"
+              aria-label="Instagram de Multirubro Expres"
+              title="@multirubroexpres"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de navegación secundaria con botón rojo "Todas las Categorías" -->
+      <div class="header-nav-bar">
+        <div class="container header-nav-inner">
+          <button
+            type="button"
+            class="all-categories-btn"
+            id="toggle-categories-btn"
+            aria-expanded="true"
+            aria-controls="desktop-category-sidebar"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <span>Todas las Categorías</span>
+            <svg class="chevron-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <nav class="primary-nav" aria-label="Navegación principal">
+            <ul class="primary-nav-list">
+              <li><a href="#inicio" aria-current="page">Inicio</a></li>
+              <li><a href="#catalogo">Productos</a></li>
+              <li><a href="#mayorista">Venta Mayorista</a></li>
+              <li><a href="#catalogo" data-filter-offer="true">Ofertas Flash</a></li>
+              <li><a href="#beneficios">Envíos</a></li>
+              <li><a href="#contacto">Contacto</a></li>
+            </ul>
+          </nav>
+
+          <div class="nav-wholesale-pill">
+            <span class="dot" aria-hidden="true"></span>
+            <span>Precios Mayoristas Activos</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Drawer móvil/tablet (<dialog> con scroll-snap nativo) -->
+    <dialog class="Drawer" id="mobile-drawer" aria-label="Menú y categorías">
+      <div class="Drawer-scroller">
+        <nav class="Drawer-sheet" aria-label="Menú móvil">
+          <div class="Drawer-header">
+            <div class="Drawer-brand">
+              <img src="/images/logo-mr-expres.png" alt="MR Expres" width="100" height="40" />
+            </div>
+            <button id="drawer-close" class="Drawer-close" type="button" aria-label="Cerrar menú" autofocus>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="Drawer-content">
+            <p class="Drawer-section-title">Navegación</p>
+            <ul class="Drawer-links">
+              <li><a href="#inicio" class="drawer-link">Inicio</a></li>
+              <li><a href="#catalogo" class="drawer-link">Todos los Productos</a></li>
+              <li><a href="#mayorista" class="drawer-link">Venta Mayorista</a></li>
+              <li><a href="#beneficios" class="drawer-link">Envíos y Pagos</a></li>
+              <li><a href="#contacto" class="drawer-link">Contacto</a></li>
+            </ul>
+
+            <p class="Drawer-section-title">Categorías</p>
+            <ul class="Drawer-categories" id="mobile-category-list"></ul>
+          </div>
+        </nav>
+      </div>
+    </dialog>
+
+    <main id="inicio">
+      <!-- Sección Hero Principal: Sidebar Categorías + Carrusel Central + 2 Banners Laterales -->
+      <section class="hero-section">
+        <div class="container hero-grid">
+          <!-- Menú vertical de categorías (como en la captura) -->
+          <aside class="category-sidebar" id="desktop-category-sidebar" aria-label="Categorías de productos">
+            <ul class="category-list" id="desktop-category-list"></ul>
+            <button type="button" class="view-all-categories-btn" id="view-all-categories-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+              </svg>
+              <span>Ver Todas las Categorías</span>
+            </button>
+
+            <!-- Panel flyout de subcategorías al hacer hover/focus -->
+            <div class="category-flyout" id="category-flyout" hidden>
+              <div class="flyout-header">
+                <span class="flyout-title" id="flyout-title">Categoría</span>
+                <span class="flyout-tag" id="flyout-tag"></span>
+              </div>
+              <ul class="flyout-sublist" id="flyout-sublist"></ul>
+            </div>
+          </aside>
+
+          <!-- Carrusel Principal (scroll-snap + controles accesibles) -->
+          <section class="hero-carousel" aria-roledescription="carousel" aria-label="Promociones principales">
+            <div class="carousel-controls">
+              <button type="button" class="carousel-btn" data-direction="previous" aria-label="Diapositiva anterior">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <button type="button" class="carousel-btn" data-direction="next" aria-label="Siguiente diapositiva">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+
+            <div class="carousel-track" tabindex="0" role="group" aria-label="Diapositivas">
+              <!-- Slide 1 -->
+              <article
+                class="hero-slide hero-slide--red"
+                role="group"
+                aria-roledescription="slide"
+                aria-label="1 de 3"
+                data-marker-name="Ir a promoción Super Ofertas"
+              >
+                <div class="slide-content">
+                  <span class="slide-eyebrow">NUEVA TEMPORADA · MAYORISTA Y MINORISTA</span>
+                  <h1 class="slide-title">SUPER OFERTAS <span class="highlight">MULTIRUBRO</span></h1>
+                  <p class="slide-desc">
+                    Indumentaria básica, sublimación, tecnología y bazar con descuentos reales por cantidad. Sin compra mínima obligatoria.
+                  </p>
+                  <div class="slide-actions">
+                    <a href="#catalogo" class="btn-primary">Explorar Catálogo</a>
+                    <a href="#mayorista" class="btn-outline-light">Ver Precios Mayoristas</a>
+                  </div>
+                </div>
+                <div class="slide-visual" aria-hidden="true">
+                  <div class="promo-badge-circle">
+                    <span class="promo-up-to">HASTA</span>
+                    <span class="promo-percent">40%</span>
+                    <span class="promo-off">OFF</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Slide 2 -->
+              <article
+                class="hero-slide hero-slide--dark"
+                role="group"
+                aria-roledescription="slide"
+                aria-label="2 de 3"
+                data-marker-name="Ir a promoción Indumentaria y Sublimación"
+              >
+                <div class="slide-content">
+                  <span class="slide-eyebrow">IDEAL EMPRENDEDORES Y REVENDEDORES</span>
+                  <h2 class="slide-title">BÁSICOS LISOS &amp; <span class="highlight">SUBLIMACIÓN</span></h2>
+                  <p class="slide-desc">
+                    Remeras algodón peinado 24/1, buzos frisa, gorras trucker y tazas listas para estampar. Stock permanente todo el año.
+                  </p>
+                  <div class="slide-actions">
+                    <button type="button" class="btn-primary" data-jump-category="indumentaria">Ver Indumentaria</button>
+                    <button type="button" class="btn-outline-light" data-jump-category="sublimacion">Ver Sublimación</button>
+                  </div>
+                </div>
+                <div class="slide-visual" aria-hidden="true">
+                  <div class="promo-badge-circle promo-badge-circle--gold">
+                    <span class="promo-up-to">PACKS</span>
+                    <span class="promo-percent">3+</span>
+                    <span class="promo-off">UNID.</span>
+                  </div>
+                </div>
+              </article>
+
+              <!-- Slide 3 -->
+              <article
+                class="hero-slide hero-slide--slate"
+                role="group"
+                aria-roledescription="slide"
+                aria-label="3 de 3"
+                data-marker-name="Ir a promoción Envíos Expres"
+              >
+                <div class="slide-content">
+                  <span class="slide-eyebrow">DESPACHO RÁPIDO EN EL DÍA</span>
+                  <h2 class="slide-title">ENVÍOS EXPRES A <span class="highlight">TODO EL PAÍS</span></h2>
+                  <p class="slide-desc">
+                    Armá tu carrito y enviá tu pedido directo por WhatsApp para coordinar envío por Correo, Expreso o Moto en el día.
+                  </p>
+                  <div class="slide-actions">
+                    <a href="#beneficios" class="btn-primary">Cómo Comprar</a>
+                  </div>
+                </div>
+                <div class="slide-visual" aria-hidden="true">
+                  <div class="promo-badge-circle">
+                    <span class="promo-up-to">ENVÍO</span>
+                    <span class="promo-percent">24h</span>
+                    <span class="promo-off">EXPRES</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <p class="visually-hidden" role="status" aria-live="polite"></p>
+            <nav class="carousel-markers" aria-label="Elegir diapositiva"></nav>
+          </section>
+
+          <!-- 2 Cards Promocionales Derecha (como en la captura) -->
+          <div class="hero-side-cards">
+            <a href="#catalogo" class="side-promo-card side-promo-card--light" data-jump-category="belleza">
+              <div class="side-promo-text">
+                <span class="side-promo-tag">CUIDADO PERSONAL</span>
+                <h3>Belleza &amp; Skincare</h3>
+                <p>Hasta <strong>30% OFF</strong> en kits seleccionados</p>
+              </div>
+              <span class="side-promo-cta">Ver más →</span>
+            </a>
+
+            <a href="#catalogo" class="side-promo-card side-promo-card--flash" data-filter-offer="true">
+              <div class="side-promo-text">
+                <span class="side-promo-tag">TIEMPO LIMITADO</span>
+                <h3>FLASH SALE</h3>
+                <p>Descuentos de hasta <strong>50% OFF</strong> por bulto</p>
+              </div>
+              <span class="side-promo-cta">Comprar ahora →</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Barra de Beneficios / Confianza (como en la captura) -->
+        <div class="container" id="beneficios">
+          <ul class="trust-bar">
+            <li class="trust-item">
+              <span class="trust-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+              </span>
+              <div>
+                <strong>Envíos a Todo el País</strong>
+                <span>Correo, Expreso y Moto</span>
+              </div>
+            </li>
+            <li class="trust-item">
+              <span class="trust-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+              </span>
+              <div>
+                <strong>Precios Mayoristas</strong>
+                <span>Descuentos desde 3 unidades</span>
+              </div>
+            </li>
+            <li class="trust-item">
+              <span class="trust-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </span>
+              <div>
+                <strong>Compra Segura</strong>
+                <span>Transferencia, MP y Efectivo</span>
+              </div>
+            </li>
+            <li class="trust-item">
+              <span class="trust-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              </span>
+              <div>
+                <strong>Atención Inmediata</strong>
+                <span>Soporte directo por WhatsApp</span>
+              </div>
+            </li>
+            <li class="trust-item">
+              <span class="trust-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              </span>
+              <div>
+                <strong>Cambios Fáciles</strong>
+                <span>Garantía directa de fábrica</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Sección de Catálogo con Filtros (organización principal estilo Royalty / Danina / Sublishop) -->
+      <section class="catalog-section" id="catalogo">
+        <div class="container">
+          <div class="catalog-header">
+            <div>
+              <span class="section-kicker">CATÁLOGO MULTIRUBRO</span>
+              <h2 class="section-title" id="catalog-title">Productos Destacados</h2>
+            </div>
+
+            <div class="catalog-controls">
+              <label class="wholesale-toggle">
+                <input type="checkbox" id="wholesale-mode-toggle" />
+                <span>Ver precios mayoristas</span>
+              </label>
+
+              <div class="sort-wrapper">
+                <label class="visually-hidden" for="sort-select">Ordenar productos</label>
+                <select id="sort-select">
+                  <option value="featured">Ordenar: Destacados</option>
+                  <option value="price-asc">Menor precio</option>
+                  <option value="price-desc">Mayor precio</option>
+                  <option value="discount">Mayor descuento</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Chips rápidos de categorías -->
+          <div class="category-pills" id="category-pills" role="tablist" aria-label="Filtrar por categoría"></div>
+
+          <!-- Grilla de productos -->
+          <div class="products-grid" id="products-grid"></div>
+
+          <!-- Estado vacío -->
+          <div class="empty-state" id="empty-state" hidden>
+            <p>No encontramos productos que coincidan con tu búsqueda.</p>
+            <button type="button" class="btn-primary" id="reset-filters-btn">Ver todos los productos</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Banner Mayorista (inspirado en Danina Store & Royalty) -->
+      <section class="wholesale-banner" id="mayorista">
+        <div class="container wholesale-inner">
+          <div class="wholesale-copy">
+            <span class="wholesale-badge">VENTA MAYORISTA &amp; EMPRENDEDORES</span>
+            <h2>¿Tenés local, showroom o vendés por redes?</h2>
+            <p>
+              Accedé a precios mayoristas automáticos llevando 3 o más unidades por producto o surtido. Te asesoramos por WhatsApp para armar tu primer pedido.
+            </p>
+          </div>
+          <div class="wholesale-cta">
+            <a
+              href="https://wa.me/5491100000000?text=Hola%20Multirubro%20Expres!%20Quiero%20consultar%20por%20precios%20mayoristas."
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-whatsapp"
+            >
+              Consultar Mayorista por WhatsApp
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer" id="contacto">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <img src="/images/logo-mr-expres.png" alt="Multirubro Expres" width="130" height="52" loading="lazy" />
+          <p>
+            Tu tienda multirubro de confianza. Indumentaria básica, insumos para sublimación, tecnología, hogar y bazar con envíos a todo el país.
+          </p>
+        </div>
+
+        <div>
+          <h3>Categorías</h3>
+          <ul class="footer-links" id="footer-category-links"></ul>
+        </div>
+
+        <div>
+          <h3>Información</h3>
+          <ul class="footer-links">
+            <li><a href="#mayorista">Venta Mayorista</a></li>
+            <li><a href="#beneficios">Envíos y Entregas</a></li>
+            <li><a href="#beneficios">Medios de Pago</a></li>
+            <li><a href="#catalogo">Ofertas Flash</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Contacto</h3>
+          <ul class="footer-links">
+            <li>
+              <a href="https://www.instagram.com/multirubroexpres/" target="_blank" rel="noopener noreferrer">
+                Instagram: @multirubroexpres
+              </a>
+            </li>
+            <li><span>Lunes a Sábados: 9:00 a 19:00 hs</span></li>
+            <li><span>Envíos a CABA, GBA e Interior</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="container footer-bottom-inner">
+          <p>© <span id="current-year"></span> Multirubro Expres (MR Expres). Todos los derechos reservados.</p>
+          <p>Precios expresados en Pesos Argentinos (ARS).</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Drawer de Carrito (<dialog> nativo) -->
+    <dialog class="CartDrawer" id="cart-drawer" aria-label="Carrito de compras">
+      <div class="CartDrawer-panel">
+        <header class="CartDrawer-header">
+          <h2>Tu Carrito (<span id="cart-drawer-count">0</span>)</h2>
+          <button type="button" class="CartDrawer-close" id="cart-close-btn" aria-label="Cerrar carrito" autofocus>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </header>
+
+        <div class="CartDrawer-body" id="cart-items-container"></div>
+
+        <footer class="CartDrawer-footer" id="cart-footer">
+          <div class="cart-summary-row">
+            <span>Subtotal</span>
+            <strong id="cart-subtotal">$0</strong>
+          </div>
+          <p class="cart-wholesale-note" id="cart-wholesale-note"></p>
+          <div class="cart-actions">
+            <a id="cart-whatsapp-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn-whatsapp full-width">
+              Finalizar Pedido por WhatsApp
+            </a>
+            <button type="button" id="cart-clear-btn" class="btn-secondary full-width">Vaciar carrito</button>
+          </div>
+        </footer>
+      </div>
+    </dialog>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
