@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | Multirubro Expres</title>
+    <link rel="icon" type="image/png" href="/images/logo-mr-expres.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles/admin.css" />
+  </head>
+  <body>
+    <div class="admin-shell" id="admin-shell">
+      <!-- Sidebar Desktop (inspirado en Ready eCommerce Admin) -->
+      <aside class="admin-sidebar" id="admin-sidebar" aria-label="Menú de administración">
+        <div class="sidebar-brand">
+          <a href="/admin.html" class="sidebar-logo-link">
+            <img src="/images/logo-mr-expres.png" alt="MR Expres Admin" width="112" height="44" fetchpriority="high" />
+          </a>
+          <span class="version-pill">v1.0</span>
+        </div>
+
+        <div class="sidebar-search">
+          <label class="visually-hidden" for="sidebar-menu-search">Buscar en el menú</label>
+          <input id="sidebar-menu-search" type="search" placeholder="Buscar menú..." autocomplete="off" />
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Navegación principal del panel">
+          <ul class="sidebar-menu" id="sidebar-menu">
+            <li>
+              <button type="button" class="nav-item is-active" data-view="dashboard">
+                <span class="nav-icon" aria-hidden="true">📊</span>
+                <span class="nav-text">Dashboard</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="orders">
+                <span class="nav-icon" aria-hidden="true">🧾</span>
+                <span class="nav-text">Pedidos</span>
+                <span class="nav-count" id="sidebar-orders-count">0</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="categories">
+                <span class="nav-icon" aria-hidden="true">🗂️</span>
+                <span class="nav-text">Categorías</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="products">
+                <span class="nav-icon" aria-hidden="true">📦</span>
+                <span class="nav-text">Productos</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="promotions">
+                <span class="nav-icon" aria-hidden="true">🏷️</span>
+                <span class="nav-text">Promociones</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="customers">
+                <span class="nav-icon" aria-hidden="true">👥</span>
+                <span class="nav-text">Clientes</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-item" data-view="settings">
+                <span class="nav-icon" aria-hidden="true">⚙️</span>
+                <span class="nav-text">Configuración</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="/" class="sidebar-store-link" target="_blank" rel="noopener noreferrer">
+            <span aria-hidden="true">🛍️</span>
+            <span>Ver Tienda Online</span>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Mobile Navigation Drawer (<dialog> con scroll-snap) -->
+      <dialog class="Drawer" id="admin-mobile-drawer" aria-label="Menú de administración móvil">
+        <div class="Drawer-scroller">
+          <nav class="Drawer-sheet" aria-label="Menú móvil">
+            <div class="Drawer-header">
+              <img src="/images/logo-mr-expres.png" alt="MR Expres" width="96" height="38" />
+              <button id="admin-drawer-close" class="icon-btn" type="button" aria-label="Cerrar menú" autofocus>✕</button>
+            </div>
+            <ul class="sidebar-menu" id="mobile-sidebar-menu"></ul>
+            <div class="sidebar-footer">
+              <a href="/" class="sidebar-store-link" target="_blank" rel="noopener noreferrer">
+                <span aria-hidden="true">🛍️</span>
+                <span>Ver Tienda Online</span>
+              </a>
+            </div>
+          </nav>
+        </div>
+      </dialog>
+
+      <!-- Main Column -->
+      <div class="admin-main-wrap">
+        <header class="admin-topbar">
+          <div class="topbar-left">
+            <button
+              type="button"
+              class="icon-btn mobile-only"
+              id="admin-drawer-open"
+              aria-label="Abrir menú"
+              aria-expanded="false"
+              aria-controls="admin-mobile-drawer"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <button
+              type="button"
+              class="icon-btn desktop-only"
+              id="sidebar-collapse-btn"
+              aria-label="Contraer menú lateral"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="15" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
+            <h1 class="topbar-title" id="topbar-title">Dashboard</h1>
+          </div>
+
+          <div class="topbar-right">
+            <a href="/" class="btn-outline-sm" target="_blank" rel="noopener noreferrer">Ver Tienda ↗</a>
+            <button type="button" class="icon-btn" id="theme-toggle-btn" aria-label="Cambiar tema claro/oscuro" title="Tema claro/oscuro">
+              🌙
+            </button>
+            <div class="admin-profile-pill">
+              <span class="profile-avatar" aria-hidden="true">MR</span>
+              <div class="profile-meta">
+                <strong>Super Admin</strong>
+                <span>Multirubro Expres</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main class="admin-content" id="admin-content">
+          <!-- VIEW 1: DASHBOARD -->
+          <section class="admin-view" data-view-panel="dashboard">
+            <div class="welcome-banner">
+              <div>
+                <h2>Bienvenido de nuevo, Super Admin</h2>
+                <p>Monitoreá las ventas, pedidos mayoristas y stock de Multirubro Expres en tiempo real.</p>
+              </div>
+              <button type="button" class="btn-coral" id="quick-add-product-btn">+ Nuevo Producto</button>
+            </div>
+
+            <!-- 4 KPI Cards (estilo Ready eCommerce) -->
+            <div class="kpi-grid">
+              <article class="kpi-card kpi-card--purple">
+                <div>
+                  <span class="kpi-label">Categorías Activas</span>
+                  <strong class="kpi-value" id="kpi-categories">0</strong>
+                </div>
+                <span class="kpi-icon" aria-hidden="true">🗂️</span>
+              </article>
+              <article class="kpi-card kpi-card--blue">
+                <div>
+                  <span class="kpi-label">Total Productos</span>
+                  <strong class="kpi-value" id="kpi-products">0</strong>
+                </div>
+                <span class="kpi-icon" aria-hidden="true">📦</span>
+              </article>
+              <article class="kpi-card kpi-card--coral">
+                <div>
+                  <span class="kpi-label">Total Pedidos</span>
+                  <strong class="kpi-value" id="kpi-orders">0</strong>
+                </div>
+                <span class="kpi-icon" aria-hidden="true">🛒</span>
+              </article>
+              <article class="kpi-card kpi-card--green">
+                <div>
+                  <span class="kpi-label">Facturación Acumulada</span>
+                  <strong class="kpi-value" id="kpi-revenue">$0</strong>
+                </div>
+                <span class="kpi-icon" aria-hidden="true">💰</span>
+              </article>
+            </div>
+
+            <!-- Row 2: Order Analytics + Admin Wallet -->
+            <div class="dashboard-split">
+              <section class="panel-card">
+                <div class="panel-header">
+                  <h3>Analítica de Pedidos</h3>
+                  <button type="button" class="link-btn" data-jump-view="orders">Ver todos →</button>
+                </div>
+                <div class="order-status-grid" id="dashboard-order-status-grid"></div>
+              </section>
+
+              <section class="panel-card wallet-card">
+                <div class="panel-header">
+                  <h3>Resumen de Caja</h3>
+                  <span class="badge-soft-green">ARS</span>
+                </div>
+                <div class="wallet-balance">
+                  <span class="wallet-label">Ingresos Totales</span>
+                  <strong class="wallet-amount" id="wallet-total">$0</strong>
+                </div>
+                <div class="wallet-mini-grid">
+                  <div>
+                    <span>Entregados</span>
+                    <strong id="wallet-delivered">$0</strong>
+                  </div>
+                  <div>
+                    <span>Pendientes</span>
+                    <strong id="wallet-pending">$0</strong>
+                  </div>
+                  <div>
+                    <span>Ticket Promedio</span>
+                    <strong id="wallet-avg">$0</strong>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- Row 3: Sales Chart -->
+            <section class="panel-card">
+              <div class="panel-header">
+                <h3>Estadísticas de Ventas</h3>
+                <div class="chart-tabs" role="tablist" aria-label="Período del gráfico">
+                  <button type="button" class="chart-tab is-active" data-chart-range="daily">Diario</button>
+                  <button type="button" class="chart-tab" data-chart-range="monthly">Mensual</button>
+                  <button type="button" class="chart-tab" data-chart-range="yearly">Anual</button>
+                </div>
+              </div>
+              <div class="bar-chart" id="sales-bar-chart" aria-label="Gráfico de barras de ventas"></div>
+            </section>
+
+            <!-- Row 4: Latest Orders Table -->
+            <section class="panel-card">
+              <div class="panel-header">
+                <h3 id="latest-orders-caption">Últimos Pedidos</h3>
+                <button type="button" class="link-btn" data-jump-view="orders">Ir a Pedidos →</button>
+              </div>
+              <div tabindex="0" role="region" aria-labelledby="latest-orders-caption" class="table-wrapper">
+                <table class="data-table latest-orders-table">
+                  <thead>
+                    <tr>
+                      <th>Pedido</th>
+                      <th>Cliente</th>
+                      <th>Cant.</th>
+                      <th>Fecha</th>
+                      <th>Total</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dashboard-latest-orders"></tbody>
+                </table>
+              </div>
+            </section>
+          </section>
+
+          <!-- VIEW 2: ORDERS -->
+          <section class="admin-view" data-view-panel="orders" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2 id="orders-table-caption">Lista de Pedidos</h2>
+              </div>
+              <div class="status-pills" id="order-status-filters" role="tablist" aria-label="Filtrar pedidos por estado"></div>
+              <div tabindex="0" role="region" aria-labelledby="orders-table-caption" class="table-wrapper">
+                <table class="data-table orders-table">
+                  <thead>
+                    <tr>
+                      <th>ID Pedido</th>
+                      <th>Fecha</th>
+                      <th>Cliente</th>
+                      <th>Total</th>
+                      <th>Pago</th>
+                      <th>Estado</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody id="orders-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 3: CATEGORIES -->
+          <section class="admin-view" data-view-panel="categories" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2 id="categories-table-caption">Lista de Categorías</h2>
+                <button type="button" class="btn-coral" id="add-category-btn">+ Nueva Categoría</button>
+              </div>
+              <div tabindex="0" role="region" aria-labelledby="categories-table-caption" class="table-wrapper">
+                <table class="data-table categories-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nombre</th>
+                      <th>Subcategorías</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="categories-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 4: PRODUCTS -->
+          <section class="admin-view" data-view-panel="products" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2 id="products-table-caption">Catálogo de Productos</h2>
+                <div class="header-actions-group">
+                  <div class="view-switcher" role="group" aria-label="Vista de productos">
+                    <button type="button" class="switch-btn is-active" data-product-layout="list">Lista</button>
+                    <button type="button" class="switch-btn" data-product-layout="grid">Grilla</button>
+                  </div>
+                  <button type="button" class="btn-coral" id="add-product-btn">+ Nuevo Producto</button>
+                </div>
+              </div>
+
+              <div class="filters-bar">
+                <label class="visually-hidden" for="admin-product-search">Buscar producto</label>
+                <input id="admin-product-search" type="search" placeholder="Buscar por nombre de producto..." />
+                <label class="visually-hidden" for="admin-product-category-filter">Filtrar por categoría</label>
+                <select id="admin-product-category-filter">
+                  <option value="all">Todas las categorías</option>
+                </select>
+              </div>
+
+              <div id="admin-products-list-wrap" tabindex="0" role="region" aria-labelledby="products-table-caption" class="table-wrapper">
+                <table class="data-table products-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Producto</th>
+                      <th>Categoría</th>
+                      <th>Minorista</th>
+                      <th>Mayorista</th>
+                      <th>Stock</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="products-table-body"></tbody>
+                </table>
+              </div>
+
+              <div id="admin-products-grid-wrap" class="admin-products-grid" hidden></div>
+            </div>
+          </section>
+
+          <!-- VIEW 5: PROMOTIONS -->
+          <section class="admin-view" data-view-panel="promotions" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2>Ofertas Flash y Descuentos Activos</h2>
+              </div>
+              <p class="muted-text">Productos actualmente destacados con 20% OFF o más en la tienda.</p>
+              <div class="admin-products-grid" id="promo-products-grid"></div>
+            </div>
+          </section>
+
+          <!-- VIEW 6: CUSTOMERS -->
+          <section class="admin-view" data-view-panel="customers" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2 id="customers-table-caption">Clientes Registrados</h2>
+              </div>
+              <div tabindex="0" role="region" aria-labelledby="customers-table-caption" class="table-wrapper">
+                <table class="data-table customers-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Teléfono</th>
+                      <th>Pedidos</th>
+                      <th>Total Comprado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="customers-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW 7: SETTINGS -->
+          <section class="admin-view" data-view-panel="settings" hidden>
+            <div class="panel-card settings-card">
+              <div class="panel-header">
+                <h2>Configuración de Multirubro Expres</h2>
+              </div>
+              <form id="settings-form" class="admin-form">
+                <div class="form-grid">
+                  <label class="form-field">
+                    <span>Nombre de la Tienda</span>
+                    <input type="text" id="setting-store-name" required />
+                  </label>
+                  <label class="form-field">
+                    <span>WhatsApp para Pedidos (con código de país, sin +)</span>
+                    <input type="text" id="setting-whatsapp" placeholder="5491100000000" required />
+                  </label>
+                  <label class="form-field">
+                    <span>Instagram</span>
+                    <input type="text" id="setting-instagram" placeholder="@multirubroexpres" />
+                  </label>
+                  <label class="form-field">
+                    <span>Mínimo Mayorista por defecto (unidades)</span>
+                    <input type="number" id="setting-wholesale-min" min="1" max="100" required />
+                  </label>
+                </div>
+                <label class="form-field">
+                  <span>Texto de barra de anuncios</span>
+                  <input type="text" id="setting-announcement" />
+                </label>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-coral">Guardar Configuración</button>
+                  <button type="button" class="btn-outline-sm" id="reset-demo-data-btn">Restablecer datos demo</button>
+                </div>
+                <p class="save-feedback" id="settings-feedback" role="status" aria-live="polite"></p>
+              </form>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- Modal Producto (<dialog>) -->
+    <dialog class="admin-modal" id="product-modal" aria-labelledby="product-modal-title">
+      <form method="dialog" class="modal-card" id="product-form">
+        <header class="modal-header">
+          <h3 id="product-modal-title">Nuevo Producto</h3>
+          <button type="button" class="icon-btn" id="product-modal-close" aria-label="Cerrar">✕</button>
+        </header>
+        <div class="modal-body">
+          <input type="hidden" id="prod-id" />
+          <label class="form-field">
+            <span>Nombre del Producto</span>
+            <input type="text" id="prod-title" required />
+          </label>
+          <div class="form-grid">
+            <label class="form-field">
+              <span>Categoría</span>
+              <select id="prod-category" required></select>
+            </label>
+            <label class="form-field">
+              <span>Subcategoría</span>
+              <input type="text" id="prod-subcategory" required />
+            </label>
+            <label class="form-field">
+              <span>Precio Minorista (ARS)</span>
+              <input type="number" id="prod-price" min="0" required />
+            </label>
+            <label class="form-field">
+              <span>Precio Mayorista (ARS)</span>
+              <input type="number" id="prod-wholesale" min="0" required />
+            </label>
+            <label class="form-field">
+              <span>Mínimo Mayorista (u.)</span>
+              <input type="number" id="prod-wholesale-min" min="1" value="3" required />
+            </label>
+            <label class="form-field">
+              <span>Stock</span>
+              <input type="number" id="prod-stock" min="0" value="25" required />
+            </label>
+            <label class="form-field">
+              <span>Descuento (%)</span>
+              <input type="number" id="prod-discount" min="0" max="90" value="20" required />
+            </label>
+            <label class="form-field">
+              <span>Emoji / Ícono</span>
+              <input type="text" id="prod-emoji" value="📦" maxlength="4" />
+            </label>
+          </div>
+          <label class="form-field">
+            <span>Variantes (separadas por coma)</span>
+            <input type="text" id="prod-variants" placeholder="Negro, Blanco, Rojo" />
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn-outline-sm" id="product-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-coral">Guardar Producto</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Modal Categoría (<dialog>) -->
+    <dialog class="admin-modal" id="category-modal" aria-labelledby="category-modal-title">
+      <form method="dialog" class="modal-card" id="category-form">
+        <header class="modal-header">
+          <h3 id="category-modal-title">Nueva Categoría</h3>
+          <button type="button" class="icon-btn" id="category-modal-close" aria-label="Cerrar">✕</button>
+        </header>
+        <div class="modal-body">
+          <input type="hidden" id="cat-id" />
+          <label class="form-field">
+            <span>Nombre de la Categoría</span>
+            <input type="text" id="cat-name" required />
+          </label>
+          <label class="form-field">
+            <span>Etiqueta destacada</span>
+            <input type="text" id="cat-tag" placeholder="Mayorista y Minorista" />
+          </label>
+          <label class="form-field">
+            <span>Subcategorías (separadas por coma)</span>
+            <input type="text" id="cat-subs" placeholder="Sub 1, Sub 2, Sub 3" required />
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn-outline-sm" id="category-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-coral">Guardar Categoría</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- Modal Detalle de Pedido (<dialog>) -->
+    <dialog class="admin-modal" id="order-modal" aria-labelledby="order-modal-title">
+      <div class="modal-card">
+        <header class="modal-header">
+          <h3 id="order-modal-title">Detalle de Pedido</h3>
+          <button type="button" class="icon-btn" id="order-modal-close" aria-label="Cerrar">✕</button>
+        </header>
+        <div class="modal-body" id="order-modal-body"></div>
+      </div>
+    </dialog>
+
+    <script type="module" src="/src/admin.js"></script>
+  </body>
+</html>

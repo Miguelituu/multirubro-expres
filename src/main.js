@@ -1,4 +1,8 @@
-import { CATEGORIES, PRODUCTS } from './data/catalog.js';
+import { addOrder, getCategories, getProducts, getSettings } from './data/store.js';
+
+const CATEGORIES = getCategories().filter((c) => c.active !== false);
+const PRODUCTS = getProducts().filter((p) => p.active !== false);
+const SETTINGS = getSettings();
 
 const formatARS = (amount) =>
   new Intl.NumberFormat('es-AR', {
@@ -566,7 +570,8 @@ function updateCartUI() {
     : 'Tip: Llevando 3+ unidades de un mismo producto accedés al precio mayorista.';
 
   lines.push(`Total estimado: ${formatARS(subtotal)}`);
-  whatsappBtn.setAttribute('href', `https://wa.me/5491100000000?text=${encodeURIComponent(lines.join('\n'))}`);
+  const waNum = (SETTINGS.whatsappNumber || '5491100000000').replace(/\D/g, '');
+  whatsappBtn.setAttribute('href', `https://wa.me/${waNum}?text=${encodeURIComponent(lines.join('\n'))}`);
 }
 
 function openCartDrawer() {
@@ -594,6 +599,30 @@ function initCartDrawer() {
   clearBtn?.addEventListener('click', () => {
     state.cart = [];
     updateCartUI();
+  });
+
+  document.getElementById('cart-whatsapp-btn')?.addEventListener('click', () => {
+    if (state.cart.length === 0) return;
+    const total = state.cart.reduce((sum, { product, qty }) => {
+      const unit = qty >= product.wholesaleMin ? product.wholesalePrice : product.price;
+      return sum + unit * qty;
+    }, 0);
+    const itemsCount = state.cart.reduce((sum, i) => sum + i.qty, 0);
+    addOrder({
+      id: `MR-${String(Math.floor(100000 + Math.random() * 900000))}`,
+      date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      customer: 'Pedido Web WhatsApp',
+      phone: 'Vía WhatsApp',
+      itemsCount,
+      total,
+      paymentMethod: 'A coordinar',
+      status: 'Pendiente',
+      items: state.cart.map(({ product, qty }) => ({
+        title: product.title,
+        qty,
+        unitPrice: qty >= product.wholesaleMin ? product.wholesalePrice : product.price
+      }))
+    });
   });
 }
 
