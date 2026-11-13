@@ -1,4 +1,15 @@
-import { addOrder, getCategories, getProducts, getSettings } from './data/store.js';
+import {
+  addOrder,
+  getCategories,
+  getCurrentUser,
+  getOrders,
+  getProducts,
+  getSettings,
+  loginUser,
+  logoutUser,
+  registerUser,
+  updateUserProfile
+} from './data/store.js';
 
 const CATEGORIES = getCategories().filter((c) => c.active !== false);
 const PRODUCTS = getProducts().filter((p) => p.active !== false);
@@ -467,6 +478,10 @@ function renderProducts() {
       if (state.wishlist.has(product.id)) state.wishlist.delete(product.id);
       else state.wishlist.add(product.id);
       document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
+      const user = getCurrentUser();
+      if (user) {
+        updateUserProfile(user.email, { wishlist: Array.from(state.wishlist) });
+      }
       renderProducts();
     });
 
@@ -570,6 +585,15 @@ function updateCartUI() {
     : 'Tip: Llevando 3+ unidades de un mismo producto accedés al precio mayorista.';
 
   lines.push(`Total estimado: ${formatARS(subtotal)}`);
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    lines.push(`Cliente: ${currentUser.name} (${currentUser.phone})`);
+    if (currentUser.address?.street) {
+      lines.push(
+        `Dirección de envío: ${currentUser.address.street}, ${currentUser.address.city}${currentUser.address.postalCode ? ` (CP ${currentUser.address.postalCode})` : ''}${currentUser.address.notes ? ` - ${currentUser.address.notes}` : ''}`
+      );
+    }
+  }
   const waNum = (SETTINGS.whatsappNumber || '5491100000000').replace(/\D/g, '');
   whatsappBtn.setAttribute('href', `https://wa.me/${waNum}?text=${encodeURIComponent(lines.join('\n'))}`);
 }
@@ -608,11 +632,14 @@ function initCartDrawer() {
       return sum + unit * qty;
     }, 0);
     const itemsCount = state.cart.reduce((sum, i) => sum + i.qty, 0);
+    const currentUser = getCurrentUser();
     addOrder({
       id: `MR-${String(Math.floor(100000 + Math.random() * 900000))}`,
       date: new Date().toISOString().slice(0, 16).replace('T', ' '),
-      customer: 'Pedido Web WhatsApp',
-      phone: 'Vía WhatsApp',
+      userEmail: currentUser?.email || null,
+      customer: currentUser?.name || 'Pedido Web WhatsApp',
+      phone: currentUser?.phone || 'Vía WhatsApp',
+      shippingAddress: currentUser?.address || null,
       itemsCount,
       total,
       paymentMethod: 'A coordinar',
@@ -627,15 +654,258 @@ function initCartDrawer() {
 }
 
 /* =========================================================
+   5b. User Account Modal (<dialog>)
+   ========================================================= */
+function syncUserSessionUI() {
+  const user = getCurrentUser();
+  const label = document.getElementById('account-btn-label');
+  const mobileBtn = document.getElementById('mobile-account-btn');
+  if (user) {
+    const firstName = user.name.split(' ')[0];
+    if (label) label.textContent = firstName;
+    if (mobileBtn) mobileBtn.textContent = `Mi Cuenta (${firstName})`;
+    state.wishlist = new Set(user.wishlist || []);
+  } else {
+    if (label) label.textContent = 'Mi Cuenta';
+    if (mobileBtn) mobileBtn.textContent = 'Mi Cuenta / Ingresar';
+  }
+  document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
+}
+
+function renderAccountModalContent() {
+  const user = getCurrentUser();
+  const authView = document.getElementById('auth-view');
+  const profileView = document.getElementById('profile-view');
+  const titleEl = document.getElementById('account-modal-title');
+
+  if (!user) {
+    authView.hidden = false;
+    profileView.hidden = true;
+    titleEl.textContent = 'Mi Cuenta';
+    return;
+  }
+
+  authView.hidden = true;
+  profileView.hidden = false;
+  titleEl.textContent = `Cuenta de ${user.name.split(' ')[0]}`;
+  document.getElementById('profile-greeting').textContent = `Hola, ${user.name}`;
+  document.getElementById('profile-email-display').textContent = user.email;
+
+  // Populate Info & Default Address
+  document.getElementById('prof-name').value = user.name || '';
+  document.getElementById('prof-phone').value = user.phone || '';
+  document.getElementById('prof-street').value = user.address?.street || '';
+  document.getElementById('prof-city').value = user.address?.city || '';
+  document.getElementById('prof-postal').value = user.address?.postalCode || '';
+  document.getElementById('prof-notes').value = user.address?.notes || '';
+
+  // Favorites Tab
+  const favPanel = document.getElementById('profile-favorites-panel');
+  const favProducts = PRODUCTS.filter((p) => state.wishlist.has(p.id));
+  document.getElementById('profile-fav-count').textContent = String(favProducts.length);
+  favPanel.innerHTML = '';
+  if (favProducts.length === 0) {
+    favPanel.innerHTML = '<p class="cart-empty">Todavía no guardaste productos en favoritos.</p>';
+  } else {
+    favProducts.forEach((p) => {
+      const row = document.createElement('div');
+      row.className = 'account-fav-item';
+      row.innerHTML = `
+        <span class="account-fav-emoji" aria-hidden="true">${p.emoji}</span>
+        <div>
+          <strong>${p.title}</strong>
+          <div class="cart-item-price">${formatARS(p.price)} · Mayorista ${formatARS(p.wholesalePrice)}</div>
+        </div>
+        <div class="cart-item-controls">
+          <button type="button" class="btn-secondary-sm fav-add-cart">Agregar</button>
+          <button type="button" class="cart-item-remove fav-remove" aria-label="Quitar de favoritos">✕</button>
+        </div>
+      `;
+      row.querySelector('.fav-add-cart').addEventListener('click', () => {
+        document.getElementById('account-modal').close();
+        addToCart(p);
+      });
+      row.querySelector('.fav-remove').addEventListener('click', () => {
+        state.wishlist.delete(p.id);
+        updateUserProfile(user.email, { wishlist: Array.from(state.wishlist) });
+        syncUserSessionUI();
+        renderProducts();
+        renderAccountModalContent();
+      });
+      favPanel.appendChild(row);
+    });
+  }
+
+  // Orders Tab
+  const ordersPanel = document.getElementById('profile-orders-panel');
+  const userOrders = getOrders().filter(
+    (o) => o.userEmail === user.email || o.customer.toLowerCase() === user.name.toLowerCase()
+  );
+  document.getElementById('profile-orders-count').textContent = String(userOrders.length);
+  ordersPanel.innerHTML = '';
+  if (userOrders.length === 0) {
+    ordersPanel.innerHTML = '<p class="cart-empty">Aún no realizaste pedidos con esta cuenta.</p>';
+  } else {
+    userOrders.forEach((o) => {
+      const card = document.createElement('article');
+      card.className = 'account-order-card';
+      card.innerHTML = `
+        <div class="account-order-top">
+          <strong>${o.id} · ${o.date}</strong>
+          <span class="order-status-badge">${o.status}</span>
+        </div>
+        <ul class="account-order-items">
+          ${(o.items || []).map((i) => `<li>${i.qty}x ${i.title} (${formatARS(i.unitPrice)} c/u)</li>`).join('')}
+        </ul>
+        <div><strong>Total: ${formatARS(o.total)}</strong> · Pago: ${o.paymentMethod}</div>
+      `;
+      ordersPanel.appendChild(card);
+    });
+  }
+}
+
+function initAccountModal(mobileDrawerApi) {
+  const modal = document.getElementById('account-modal');
+  const openBtn = document.getElementById('account-open-btn');
+  const mobileOpenBtn = document.getElementById('mobile-account-btn');
+  const closeBtn = document.getElementById('account-close-btn');
+
+  function openAccountModal() {
+    renderAccountModalContent();
+    modal.showModal();
+    openBtn?.setAttribute('aria-expanded', 'true');
+  }
+
+  openBtn?.addEventListener('click', openAccountModal);
+  mobileOpenBtn?.addEventListener('click', () => {
+    mobileDrawerApi?.closeDrawer();
+    openAccountModal();
+  });
+  closeBtn?.addEventListener('click', () => modal.close());
+  modal?.addEventListener('close', () => openBtn?.setAttribute('aria-expanded', 'false'));
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) modal.close();
+  });
+
+  // Auth tabs (Login / Register)
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  document.querySelectorAll('[data-auth-tab]').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.authTab;
+      document.querySelectorAll('[data-auth-tab]').forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-selected', String(active));
+      });
+      loginForm.hidden = target !== 'login';
+      registerForm.hidden = target !== 'register';
+    });
+  });
+
+  loginForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const res = loginUser(
+      document.getElementById('login-email').value,
+      document.getElementById('login-password').value
+    );
+    const errEl = document.getElementById('login-error');
+    if (!res.ok) {
+      errEl.textContent = res.error;
+      return;
+    }
+    errEl.textContent = '';
+    syncUserSessionUI();
+    renderProducts();
+    updateCartUI();
+    renderAccountModalContent();
+  });
+
+  registerForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const res = registerUser({
+      name: document.getElementById('reg-name').value,
+      email: document.getElementById('reg-email').value,
+      phone: document.getElementById('reg-phone').value,
+      password: document.getElementById('reg-password').value,
+      address: {
+        street: document.getElementById('reg-street').value,
+        city: document.getElementById('reg-city').value,
+        postalCode: document.getElementById('reg-postal').value,
+        notes: document.getElementById('reg-notes').value
+      }
+    });
+    const errEl = document.getElementById('register-error');
+    if (!res.ok) {
+      errEl.textContent = res.error;
+      return;
+    }
+    errEl.textContent = '';
+    if (state.wishlist.size > 0) {
+      updateUserProfile(res.user.email, { wishlist: Array.from(state.wishlist) });
+    }
+    syncUserSessionUI();
+    renderProducts();
+    updateCartUI();
+    renderAccountModalContent();
+  });
+
+  // Profile tabs
+  document.querySelectorAll('[data-profile-tab]').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.profileTab;
+      document.querySelectorAll('[data-profile-tab]').forEach((t) => {
+        const active = t === tab;
+        t.classList.toggle('is-active', active);
+        t.setAttribute('aria-selected', String(active));
+      });
+      document.querySelectorAll('[data-profile-panel]').forEach((panel) => {
+        panel.hidden = panel.dataset.profilePanel !== target;
+      });
+    });
+  });
+
+  document.getElementById('profile-info-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = getCurrentUser();
+    if (!user) return;
+    updateUserProfile(user.email, {
+      name: document.getElementById('prof-name').value.trim(),
+      phone: document.getElementById('prof-phone').value.trim(),
+      address: {
+        street: document.getElementById('prof-street').value.trim(),
+        city: document.getElementById('prof-city').value.trim(),
+        postalCode: document.getElementById('prof-postal').value.trim(),
+        notes: document.getElementById('prof-notes').value.trim()
+      }
+    });
+    syncUserSessionUI();
+    updateCartUI();
+    document.getElementById('profile-save-msg').textContent = '✓ Datos y dirección de envío actualizados.';
+  });
+
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    logoutUser();
+    state.wishlist.clear();
+    syncUserSessionUI();
+    renderProducts();
+    updateCartUI();
+    renderAccountModalContent();
+  });
+}
+
+/* =========================================================
    6. Bootstrap App
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('current-year').textContent = String(new Date().getFullYear());
 
   const mobileDrawerApi = initMobileDrawer();
+  syncUserSessionUI();
   initCarousel();
   initCategories(mobileDrawerApi);
   initCartDrawer();
+  initAccountModal(mobileDrawerApi);
   renderCategoryPills();
   renderProducts();
   updateCartUI();

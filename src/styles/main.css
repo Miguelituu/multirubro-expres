@@ -1821,3 +1821,237 @@ select {
   font-weight: 600;
   cursor: pointer;
 }
+
+/* =========================================================
+   Account & Auth Modal (<dialog>)
+   ========================================================= */
+.AccountModal {
+  border: 0;
+  border-radius: var(--radius-lg);
+  padding: 0;
+  width: min(620px, 100dvw - 1.5rem);
+  max-height: min(88dvh, 760px);
+  background: #fff;
+  color: var(--text-main);
+  box-shadow: var(--shadow-lg);
+}
+
+.AccountModal::backdrop {
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.AccountModal-card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  max-height: min(88dvh, 760px);
+}
+
+.AccountModal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.AccountModal-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.AccountModal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.AccountModal-body[hidden],
+.account-form[hidden],
+.account-panel[hidden] {
+  display: none;
+}
+
+.account-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  background: #f3f4f6;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+}
+
+.account-tab {
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-tab.is-active {
+  background: #fff;
+  color: var(--brand-red);
+  box-shadow: var(--shadow-sm);
+}
+
+.account-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.account-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+.account-field {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.account-field input {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.account-subhead {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--brand-red);
+  font-weight: 700;
+}
+
+.account-error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.account-success {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #15803d;
+  font-weight: 600;
+}
+
+.account-admin-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-light);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.account-admin-link {
+  color: var(--brand-red);
+  font-weight: 700;
+}
+
+.profile-banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+}
+
+.profile-banner strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.profile-banner span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.profile-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.btn-secondary-sm {
+  background: #e5e7eb;
+  color: var(--text-main);
+  border: 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-panel {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.account-fav-item,
+.account-order-card {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  background: #fff;
+}
+
+.account-fav-item {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.account-fav-emoji {
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+.account-order-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.order-status-badge {
+  background: #fef2f2;
+  color: var(--brand-red);
+  border: 1px solid #fecaca;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+}
+
+.account-order-items {
+  margin: 0.35rem 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}

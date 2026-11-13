@@ -4,7 +4,9 @@ const KEYS = {
   products: 'mr_expres_products_v1',
   categories: 'mr_expres_categories_v1',
   orders: 'mr_expres_orders_v1',
-  settings: 'mr_expres_settings_v1'
+  settings: 'mr_expres_settings_v1',
+  users: 'mr_expres_users_v1',
+  session: 'mr_expres_session_v1'
 };
 
 const DEFAULT_SETTINGS = {
@@ -153,4 +155,75 @@ export function resetAllDemoData() {
   localStorage.removeItem(KEYS.categories);
   localStorage.removeItem(KEYS.orders);
   localStorage.removeItem(KEYS.settings);
+}
+
+/* =========================================================
+   User Accounts & Session
+   ========================================================= */
+export function getUsers() {
+  return readJSON(KEYS.users, []);
+}
+
+export function saveUsers(users) {
+  writeJSON(KEYS.users, users);
+}
+
+export function getCurrentUser() {
+  try {
+    const email = localStorage.getItem(KEYS.session);
+    if (!email) return null;
+    return getUsers().find((u) => u.email === email) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function registerUser({ name, email, phone, password, address }) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const users = getUsers();
+  if (users.some((u) => u.email === normalizedEmail)) {
+    return { ok: false, error: 'Ya existe una cuenta con ese email.' };
+  }
+  const newUser = {
+    id: `usr-${Date.now()}`,
+    name: name.trim(),
+    email: normalizedEmail,
+    phone: phone.trim(),
+    password,
+    address: {
+      street: address?.street?.trim() || '',
+      city: address?.city?.trim() || '',
+      postalCode: address?.postalCode?.trim() || '',
+      notes: address?.notes?.trim() || ''
+    },
+    wishlist: [],
+    createdAt: new Date().toISOString().slice(0, 10)
+  };
+  users.push(newUser);
+  saveUsers(users);
+  localStorage.setItem(KEYS.session, normalizedEmail);
+  return { ok: true, user: newUser };
+}
+
+export function loginUser(email, password) {
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = getUsers().find((u) => u.email === normalizedEmail && u.password === password);
+  if (!user) {
+    return { ok: false, error: 'Email o contraseña incorrectos.' };
+  }
+  localStorage.setItem(KEYS.session, normalizedEmail);
+  return { ok: true, user };
+}
+
+export function logoutUser() {
+  localStorage.removeItem(KEYS.session);
+}
+
+export function updateUserProfile(email, updates) {
+  const users = getUsers();
+  const idx = users.findIndex((u) => u.email === email);
+  if (idx < 0) return null;
+  users[idx] = { ...users[idx], ...updates };
+  saveUsers(users);
+  return users[idx];
 }

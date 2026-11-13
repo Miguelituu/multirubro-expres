@@ -128,18 +128,21 @@
               </svg>
             </a>
 
-            <a
-              href="/admin.html"
+            <button
+              type="button"
+              id="account-open-btn"
               class="admin-access-btn"
-              aria-label="Ir al Panel Admin"
-              title="Panel de Administración"
+              aria-label="Mi Cuenta"
+              aria-controls="account-modal"
+              aria-expanded="false"
+              title="Mi Cuenta / Registro / Admin"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                 <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              <span>Admin</span>
-            </a>
+              <span id="account-btn-label">Mi Cuenta</span>
+            </button>
           </div>
         </div>
       </div>
@@ -208,7 +211,8 @@
               <li><a href="#mayorista" class="drawer-link">Venta Mayorista</a></li>
               <li><a href="#beneficios" class="drawer-link">Envíos y Pagos</a></li>
               <li><a href="#contacto" class="drawer-link">Contacto</a></li>
-              <li><a href="/admin.html" class="drawer-link drawer-link--admin">Panel Admin</a></li>
+              <li><button type="button" id="mobile-account-btn" class="drawer-link drawer-link--admin">Mi Cuenta / Ingresar</button></li>
+              <li><a href="/admin.html" class="drawer-link">Panel Admin</a></li>
             </ul>
 
             <p class="Drawer-section-title">Categorías</p>
@@ -563,6 +567,151 @@
             <button type="button" id="cart-clear-btn" class="btn-secondary full-width">Vaciar carrito</button>
           </div>
         </footer>
+      </div>
+    </dialog>
+
+    <!-- Modal de Cuenta de Usuario (<dialog>) -->
+    <dialog class="AccountModal" id="account-modal" aria-labelledby="account-modal-title">
+      <div class="AccountModal-card">
+        <header class="AccountModal-header">
+          <h2 id="account-modal-title">Mi Cuenta</h2>
+          <button type="button" class="CartDrawer-close" id="account-close-btn" aria-label="Cerrar ventana" autofocus>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </header>
+
+        <!-- Vista Invitado (Login / Registro) -->
+        <div id="auth-view" class="AccountModal-body">
+          <div class="account-tabs" role="tablist" aria-label="Acceso de usuario">
+            <button type="button" class="account-tab is-active" data-auth-tab="login" role="tab" aria-selected="true">Ingresar</button>
+            <button type="button" class="account-tab" data-auth-tab="register" role="tab" aria-selected="false">Registrarse</button>
+          </div>
+
+          <form id="login-form" class="account-form">
+            <label class="account-field">
+              <span>Email</span>
+              <input type="email" id="login-email" required autocomplete="email" placeholder="tu@email.com" />
+            </label>
+            <label class="account-field">
+              <span>Contraseña</span>
+              <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" />
+            </label>
+            <p class="account-error" id="login-error" role="alert"></p>
+            <button type="submit" class="btn-primary full-width">Ingresar a mi cuenta</button>
+          </form>
+
+          <form id="register-form" class="account-form" hidden>
+            <div class="account-form-grid">
+              <label class="account-field">
+                <span>Nombre completo</span>
+                <input type="text" id="reg-name" required autocomplete="name" placeholder="Ej: Juan Pérez" />
+              </label>
+              <label class="account-field">
+                <span>Teléfono / WhatsApp</span>
+                <input type="tel" id="reg-phone" required autocomplete="tel" placeholder="11 5555-0000" />
+              </label>
+              <label class="account-field">
+                <span>Email</span>
+                <input type="email" id="reg-email" required autocomplete="email" placeholder="tu@email.com" />
+              </label>
+              <label class="account-field">
+                <span>Contraseña</span>
+                <input type="password" id="reg-password" required minlength="4" autocomplete="new-password" placeholder="Mínimo 4 caracteres" />
+              </label>
+            </div>
+
+            <p class="account-subhead">Dirección por defecto para envíos</p>
+            <div class="account-form-grid">
+              <label class="account-field">
+                <span>Calle y altura</span>
+                <input type="text" id="reg-street" required autocomplete="street-address" placeholder="Av. Corrientes 1234" />
+              </label>
+              <label class="account-field">
+                <span>Ciudad / Provincia</span>
+                <input type="text" id="reg-city" required autocomplete="address-level2" placeholder="CABA, Buenos Aires" />
+              </label>
+              <label class="account-field">
+                <span>Código Postal</span>
+                <input type="text" id="reg-postal" autocomplete="postal-code" placeholder="1043" />
+              </label>
+              <label class="account-field">
+                <span>Piso / Depto / Referencias</span>
+                <input type="text" id="reg-notes" placeholder="Opcional" />
+              </label>
+            </div>
+            <p class="account-error" id="register-error" role="alert"></p>
+            <button type="submit" class="btn-primary full-width">Crear cuenta y guardar datos</button>
+          </form>
+
+          <div class="account-admin-footer">
+            <span>¿Sos administrador de la tienda?</span>
+            <a href="/admin.html" class="account-admin-link">Ir al Panel Admin →</a>
+          </div>
+        </div>
+
+        <!-- Vista Usuario Logueado -->
+        <div id="profile-view" class="AccountModal-body" hidden>
+          <div class="profile-banner">
+            <div>
+              <strong id="profile-greeting">Hola!</strong>
+              <span id="profile-email-display"></span>
+            </div>
+            <div class="profile-banner-actions">
+              <a href="/admin.html" class="account-admin-link">Panel Admin</a>
+              <button type="button" id="logout-btn" class="btn-secondary-sm">Cerrar sesión</button>
+            </div>
+          </div>
+
+          <div class="account-tabs" role="tablist" aria-label="Secciones de mi cuenta">
+            <button type="button" class="account-tab is-active" data-profile-tab="info" role="tab" aria-selected="true">Mis Datos y Envío</button>
+            <button type="button" class="account-tab" data-profile-tab="favorites" role="tab" aria-selected="false">Favoritos (<span id="profile-fav-count">0</span>)</button>
+            <button type="button" class="account-tab" data-profile-tab="orders" role="tab" aria-selected="false">Mis Pedidos (<span id="profile-orders-count">0</span>)</button>
+          </div>
+
+          <!-- Tab 1: Datos y Dirección -->
+          <form id="profile-info-form" class="account-form" data-profile-panel="info">
+            <div class="account-form-grid">
+              <label class="account-field">
+                <span>Nombre completo</span>
+                <input type="text" id="prof-name" required />
+              </label>
+              <label class="account-field">
+                <span>Teléfono / WhatsApp</span>
+                <input type="tel" id="prof-phone" required />
+              </label>
+            </div>
+            <p class="account-subhead">Dirección por defecto para envíos</p>
+            <div class="account-form-grid">
+              <label class="account-field">
+                <span>Calle y altura</span>
+                <input type="text" id="prof-street" required />
+              </label>
+              <label class="account-field">
+                <span>Ciudad / Provincia</span>
+                <input type="text" id="prof-city" required />
+              </label>
+              <label class="account-field">
+                <span>Código Postal</span>
+                <input type="text" id="prof-postal" />
+              </label>
+              <label class="account-field">
+                <span>Piso / Depto / Referencias</span>
+                <input type="text" id="prof-notes" />
+              </label>
+            </div>
+            <button type="submit" class="btn-primary">Guardar cambios</button>
+            <p class="account-success" id="profile-save-msg" role="status" aria-live="polite"></p>
+          </form>
+
+          <!-- Tab 2: Favoritos -->
+          <div id="profile-favorites-panel" class="account-panel" data-profile-panel="favorites" hidden></div>
+
+          <!-- Tab 3: Mis Pedidos -->
+          <div id="profile-orders-panel" class="account-panel" data-profile-panel="orders" hidden></div>
+        </div>
       </div>
     </dialog>
 
