@@ -1,3 +1,4 @@
+import { iconHtml, refreshIcons } from './data/icons.js';
 import {
   getCategories,
   getFaqs,
@@ -710,6 +711,7 @@ function renderAll() {
 document.addEventListener('DOMContentLoaded', () => {
   initAdminMobileDrawer();
   renderAll();
+  refreshIcons();
 
   document.querySelectorAll('#sidebar-menu .nav-item[data-view]').forEach((btn) => {
     btn.addEventListener('click', () => switchView(btn.dataset.view));
@@ -734,7 +736,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('theme-toggle-btn')?.addEventListener('click', (e) => {
     const isDark = document.documentElement.dataset.theme === 'dark';
     document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
-    e.currentTarget.textContent = isDark ? '🌙' : '☀️';
+    e.currentTarget.innerHTML = iconHtml(isDark ? 'moon' : 'sun', 18);
+    refreshIcons(e.currentTarget);
   });
 
   document.querySelectorAll('.chart-tab').forEach((tab) => {

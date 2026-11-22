@@ -1,0 +1,103 @@
+import {
+  ArrowLeft,
+  ArrowUp,
+  BadgeDollarSign,
+  Camera,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleDollarSign,
+  createIcons,
+  Dumbbell,
+  Eye,
+  FileText,
+  FolderTree,
+  Gift,
+  Headphones,
+  Heart,
+  HelpCircle,
+  Home,
+  LayoutDashboard,
+  LayoutGrid,
+  Menu,
+  MessageCircle,
+  Moon,
+  Package,
+  Palette,
+  Paperclip,
+  Printer,
+  RefreshCw,
+  Search,
+  Settings,
+  ShieldCheck,
+  Shirt,
+  ShoppingBag,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Sun,
+  Tag,
+  Truck,
+  User,
+  Users,
+  X
+} from 'lucide';
+
+export const APP_ICONS = {
+  ArrowLeft,
+  ArrowUp,
+  BadgeDollarSign,
+  Camera,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  CircleDollarSign,
+  Dumbbell,
+  Eye,
+  FileText,
+  FolderTree,
+  Gift,
+  Headphones,
+  Heart,
+  HelpCircle,
+  Home,
+  LayoutDashboard,
+  LayoutGrid,
+  Menu,
+  MessageCircle,
+  Moon,
+  Package,
+  Palette,
+  Paperclip,
+  Printer,
+  RefreshCw,
+  Search,
+  Settings,
+  ShieldCheck,
+  Shirt,
+  ShoppingBag,
+  ShoppingCart,
+  Sparkles,
+  Store,
+  Sun,
+  Tag,
+  Truck,
+  User,
+  Users,
+  X
+};
+
+export function refreshIcons(root = document) {
+  createIcons({
+    icons: APP_ICONS,
+    attrs: {
+      'stroke-width': 1.9,
+      'aria-hidden': 'true'
+    },
+    root
+  });
+}
+
+export function iconHtml(name, size = 18, extraClass = '') {
+  return `<i data-lucide="${name}" class="lucide-icon ${extraClass}" style="width:${size}px;height:${size}px" aria-hidden="true"></i>`;
+}

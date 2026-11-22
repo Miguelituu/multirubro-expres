@@ -11,6 +11,7 @@ import {
   registerUser,
   updateUserProfile
 } from './data/store.js';
+import { iconHtml, refreshIcons } from './data/icons.js';
 import { getProductGallerySlides, renderProductVisual } from './data/visuals.js';
 
 const CATEGORIES = getCategories().filter((c) => c.active !== false);
@@ -25,15 +26,15 @@ const formatARS = (amount) =>
   }).format(amount);
 
 const ICONS = {
-  shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>',
-  printer: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>',
-  headphones: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>',
-  home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>',
-  sparkles: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"></path></svg>',
-  gift: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 12 20 22 4 22 4 12"></polyline><rect x="2" y="7" width="20" height="5"></rect><line x1="12" y1="22" x2="12" y2="7"></line><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path></svg>',
-  dumbbell: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 6.5l11 11"></path><path d="M21 21l-1-1"></path><path d="M3 3l1 1"></path><path d="M18 22l4-4"></path><path d="M2 6l4-4"></path><path d="M3 10l7-7"></path><path d="M14 21l7-7"></path></svg>',
-  bag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>',
-  chevronRight: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>'
+  shirt: iconHtml('shirt', 18),
+  printer: iconHtml('printer', 18),
+  headphones: iconHtml('headphones', 18),
+  home: iconHtml('home', 18),
+  sparkles: iconHtml('sparkles', 18),
+  gift: iconHtml('gift', 18),
+  dumbbell: iconHtml('dumbbell', 18),
+  bag: iconHtml('shopping-bag', 18),
+  chevronRight: iconHtml('chevron-right', 16)
 };
 
 const state = {
@@ -444,7 +445,7 @@ function createProductCard(product) {
         ${slides.map((s, i) => `<button type="button" class="card-gal-dot ${i === 0 ? 'is-active' : ''}" data-slide="${i}" aria-label="${s.label}"></button>`).join('')}
       </div>
       <button type="button" class="quick-view-btn" aria-label="Vista rápida de ${product.title}">
-        👁 Vista rápida
+        ${iconHtml('eye', 14)} <span>Vista rápida</span>
       </button>
     </div>
     <div class="product-body">
@@ -556,6 +557,7 @@ function renderProducts() {
   const fragment = document.createDocumentFragment();
   items.forEach((product) => fragment.appendChild(createProductCard(product)));
   grid.appendChild(fragment);
+  refreshIcons(grid);
 }
 
 /* =========================================================
@@ -1283,6 +1285,7 @@ function renderProductPage(product) {
     .concat(PRODUCTS.filter((p) => p.id !== product.id && p.category !== product.category))
     .slice(0, 4);
   related.forEach((p) => relatedGrid.appendChild(createProductCard(p)));
+  refreshIcons(relatedGrid);
 
   document.getElementById('home-view').hidden = true;
   document.getElementById('product-page-view').hidden = false;
@@ -1346,6 +1349,7 @@ function renderCatalogPage() {
     const frag = document.createDocumentFragment();
     items.forEach((p) => frag.appendChild(createProductCard(p)));
     grid.appendChild(frag);
+    refreshIcons(grid);
   }
 }
 
@@ -1522,6 +1526,7 @@ function renderHomeCategories() {
     btn.addEventListener('click', () => navigateToCatalog(cat.id));
     grid.appendChild(btn);
   });
+  refreshIcons(grid);
 }
 
 function initCatalogPageView() {
@@ -1558,7 +1563,10 @@ function initThemeToggle() {
 
   function applyTheme(theme) {
     document.documentElement.dataset.theme = theme;
-    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (icon) {
+      icon.innerHTML = iconHtml(theme === 'dark' ? 'sun' : 'moon', 18);
+      refreshIcons(icon);
+    }
   }
 
   const saved = localStorage.getItem('mr_expres_theme');
@@ -1664,6 +1672,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProducts();
   updateCartUI();
   handleRoute();
+  refreshIcons();
 
   // Search form
   document.getElementById('search-form')?.addEventListener('submit', (e) => {

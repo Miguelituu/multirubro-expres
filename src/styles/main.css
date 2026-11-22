@@ -3255,6 +3255,19 @@ select {
   border-radius: var(--radius-sm);
 }
 
+.lucide-inline {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lucide-icon {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 @media (max-width: 680px) {
   .pp-gallery {
     grid-template-columns: 1fr;
