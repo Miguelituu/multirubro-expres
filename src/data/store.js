@@ -5,6 +5,7 @@ const KEYS = {
   categories: 'mr_expres_categories_v1',
   orders: 'mr_expres_orders_v1',
   settings: 'mr_expres_settings_v1',
+  faqs: 'mr_expres_faqs_v1',
   users: 'mr_expres_users_v1',
   session: 'mr_expres_session_v1'
 };
@@ -14,8 +15,37 @@ const DEFAULT_SETTINGS = {
   whatsappNumber: '5491100000000',
   instagramHandle: '@multirubroexpres',
   announcementText: 'Envíos a todo el país · Venta Mayorista y Minorista · Pedidos por WhatsApp',
-  wholesaleDefaultMin: 3
+  wholesaleDefaultMin: 3,
+  heroTitle: 'SUPER OFERTAS MULTIRUBRO',
+  heroDesc: 'Indumentaria básica, sublimación, tecnología y bazar con descuentos reales por cantidad. Sin compra mínima obligatoria.',
+  sublimationTitle: 'Personalizamos tazas, gorras y remeras con tu diseño',
+  sublimationDesc: '¿Tenés un emprendimiento, evento o egresados? Elegí el producto sublimable, adjuntá tu logo o diseño desde la ficha del producto y recibí tu cotización al instante por WhatsApp.',
+  wholesaleTitle: '¿Tenés local, showroom o vendés por redes?',
+  wholesaleDesc: 'Accedé a precios mayoristas automáticos llevando 3 o más unidades por producto o surtido. Te asesoramos por WhatsApp para armar tu primer pedido.'
 };
+
+const DEFAULT_FAQS = [
+  {
+    id: 'faq-1',
+    question: '¿Hay monto mínimo de compra mayorista?',
+    answer: 'No exigimos compra mínima obligatoria en dinero. Podés acceder al precio mayorista llevando desde 3 unidades (o 6 en gorras) por producto.'
+  },
+  {
+    id: 'faq-2',
+    question: '¿Hacen envíos a todo el país?',
+    answer: 'Sí, despachamos en 24 hs hábiles por Correo Argentino, Andreani, expresos al interior y moto mensajería en el día para CABA y GBA.'
+  },
+  {
+    id: 'faq-3',
+    question: '¿Cómo envío mi diseño para productos sublimables?',
+    answer: 'Entrá a cualquier producto de la categoría Sublimación, adjuntá tu archivo (PNG, JPG, PDF, SVG, AI o CDR) y tocá "Enviar Diseño y Cotizar por WhatsApp".'
+  },
+  {
+    id: 'faq-4',
+    question: '¿Qué medios de pago aceptan?',
+    answer: 'Aceptamos transferencia bancaria, Mercado Pago, tarjetas y efectivo al retirar o por moto mensajería.'
+  }
+];
 
 const DEFAULT_ORDERS = [
   {
@@ -143,11 +173,19 @@ export function addOrder(order) {
 }
 
 export function getSettings() {
-  return readJSON(KEYS.settings, DEFAULT_SETTINGS);
+  return { ...DEFAULT_SETTINGS, ...readJSON(KEYS.settings, DEFAULT_SETTINGS) };
 }
 
 export function saveSettings(settings) {
   writeJSON(KEYS.settings, settings);
+}
+
+export function getFaqs() {
+  return readJSON(KEYS.faqs, DEFAULT_FAQS);
+}
+
+export function saveFaqs(faqs) {
+  writeJSON(KEYS.faqs, faqs);
 }
 
 export function resetAllDemoData() {
@@ -155,6 +193,7 @@ export function resetAllDemoData() {
   localStorage.removeItem(KEYS.categories);
   localStorage.removeItem(KEYS.orders);
   localStorage.removeItem(KEYS.settings);
+  localStorage.removeItem(KEYS.faqs);
 }
 
 /* =========================================================

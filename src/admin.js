@@ -1,10 +1,13 @@
 import {
   getCategories,
+  getFaqs,
   getOrders,
   getProducts,
   getSettings,
+  getUsers,
   resetAllDemoData,
   saveCategories,
+  saveFaqs,
   saveOrders,
   saveProducts,
   saveSettings
@@ -33,6 +36,7 @@ const VIEW_TITLES = {
   products: 'Productos',
   promotions: 'Promociones y Ofertas',
   customers: 'Clientes',
+  faqs: 'Preguntas Frecuentes',
   settings: 'Configuración'
 };
 
@@ -501,6 +505,9 @@ function openProductModal(prod = null) {
   document.getElementById('prod-discount').value = prod ? prod.discount : 20;
   document.getElementById('prod-emoji').value = prod ? prod.emoji || '📦' : '📦';
   document.getElementById('prod-variants').value = prod ? (prod.variants || []).join(', ') : 'Negro, Blanco';
+  document.getElementById('prod-description').value = prod ? prod.description || '' : '';
+  document.getElementById('prod-gallery').value = prod && Array.isArray(prod.gallery) ? prod.gallery.join(', ') : '';
+  document.getElementById('prod-customizable').checked = Boolean(prod?.customizable);
   modal.showModal();
 }
 
@@ -528,11 +535,20 @@ function renderPromotionsAndCustomers() {
 
   const orders = getOrders();
   const byCustomer = new Map();
+  getUsers().forEach((u) => {
+    byCustomer.set(u.name.toLowerCase(), {
+      customer: `${u.name} (${u.email})`,
+      phone: u.phone || '-',
+      count: 0,
+      total: 0
+    });
+  });
   orders.forEach((o) => {
-    const prev = byCustomer.get(o.customer) || { customer: o.customer, phone: o.phone, count: 0, total: 0 };
+    const key = o.customer.toLowerCase();
+    const prev = byCustomer.get(key) || { customer: o.customer, phone: o.phone, count: 0, total: 0 };
     prev.count += 1;
     prev.total += o.total;
-    byCustomer.set(o.customer, prev);
+    byCustomer.set(key, prev);
   });
 
   const custBody = document.getElementById('customers-table-body');
@@ -549,6 +565,41 @@ function renderPromotionsAndCustomers() {
   });
 }
 
+function renderFaqs() {
+  const tbody = document.getElementById('faqs-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  getFaqs().forEach((faq, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <th>${idx + 1}</th>
+      <td data-label="Pregunta"><strong>${faq.question}</strong></td>
+      <td data-label="Respuesta">${faq.answer}</td>
+      <td data-label="Acciones">
+        <div class="row-actions">
+          <button type="button" class="action-sm-btn edit-faq-btn">Editar</button>
+          <button type="button" class="action-sm-btn action-sm-btn--danger del-faq-btn">Eliminar</button>
+        </div>
+      </td>
+    `;
+    tr.querySelector('.edit-faq-btn').addEventListener('click', () => openFaqModal(faq));
+    tr.querySelector('.del-faq-btn').addEventListener('click', () => {
+      saveFaqs(getFaqs().filter((f) => f.id !== faq.id));
+      renderFaqs();
+    });
+    tbody.appendChild(tr);
+  });
+}
+
+function openFaqModal(faq = null) {
+  const modal = document.getElementById('faq-modal');
+  document.getElementById('faq-modal-title').textContent = faq ? 'Editar Pregunta' : 'Nueva Pregunta Frecuente';
+  document.getElementById('faq-id').value = faq ? faq.id : '';
+  document.getElementById('faq-question').value = faq ? faq.question : '';
+  document.getElementById('faq-answer').value = faq ? faq.answer : '';
+  modal.showModal();
+}
+
 function loadSettingsForm() {
   const s = getSettings();
   document.getElementById('setting-store-name').value = s.storeName || '';
@@ -556,6 +607,12 @@ function loadSettingsForm() {
   document.getElementById('setting-instagram').value = s.instagramHandle || '';
   document.getElementById('setting-wholesale-min').value = s.wholesaleDefaultMin || 3;
   document.getElementById('setting-announcement').value = s.announcementText || '';
+  document.getElementById('setting-hero-title').value = s.heroTitle || '';
+  document.getElementById('setting-hero-desc').value = s.heroDesc || '';
+  document.getElementById('setting-sub-title').value = s.sublimationTitle || '';
+  document.getElementById('setting-sub-desc').value = s.sublimationDesc || '';
+  document.getElementById('setting-wholesale-title').value = s.wholesaleTitle || '';
+  document.getElementById('setting-wholesale-desc').value = s.wholesaleDesc || '';
 }
 
 function renderAll() {
@@ -564,6 +621,7 @@ function renderAll() {
   renderCategories();
   renderProducts();
   renderPromotionsAndCustomers();
+  renderFaqs();
   loadSettingsForm();
 }
 
@@ -658,6 +716,13 @@ document.addEventListener('DOMContentLoaded', () => {
         .value.split(',')
         .map((v) => v.trim())
         .filter(Boolean),
+      description: document.getElementById('prod-description').value.trim(),
+      gallery: document
+        .getElementById('prod-gallery')
+        .value.split(',')
+        .map((u) => u.trim())
+        .filter(Boolean),
+      customizable: document.getElementById('prod-customizable').checked,
       active: true
     };
 
@@ -711,9 +776,36 @@ document.addEventListener('DOMContentLoaded', () => {
       whatsappNumber: document.getElementById('setting-whatsapp').value.trim(),
       instagramHandle: document.getElementById('setting-instagram').value.trim(),
       wholesaleDefaultMin: Number(document.getElementById('setting-wholesale-min').value) || 3,
-      announcementText: document.getElementById('setting-announcement').value.trim()
+      announcementText: document.getElementById('setting-announcement').value.trim(),
+      heroTitle: document.getElementById('setting-hero-title').value.trim(),
+      heroDesc: document.getElementById('setting-hero-desc').value.trim(),
+      sublimationTitle: document.getElementById('setting-sub-title').value.trim(),
+      sublimationDesc: document.getElementById('setting-sub-desc').value.trim(),
+      wholesaleTitle: document.getElementById('setting-wholesale-title').value.trim(),
+      wholesaleDesc: document.getElementById('setting-wholesale-desc').value.trim()
     });
     document.getElementById('settings-feedback').textContent = '✓ Configuración guardada y aplicada a la tienda.';
+  });
+
+  document.getElementById('add-faq-btn')?.addEventListener('click', () => openFaqModal());
+  const faqModal = document.getElementById('faq-modal');
+  document.getElementById('faq-modal-close')?.addEventListener('click', () => faqModal.close());
+  document.getElementById('faq-modal-cancel')?.addEventListener('click', () => faqModal.close());
+  document.getElementById('faq-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('faq-id').value;
+    const payload = {
+      id: id || `faq-${Date.now()}`,
+      question: document.getElementById('faq-question').value.trim(),
+      answer: document.getElementById('faq-answer').value.trim()
+    };
+    const all = getFaqs();
+    const idx = all.findIndex((f) => f.id === payload.id);
+    if (idx >= 0) all[idx] = payload;
+    else all.push(payload);
+    saveFaqs(all);
+    faqModal.close();
+    renderFaqs();
   });
 
   document.getElementById('reset-demo-data-btn')?.addEventListener('click', () => {

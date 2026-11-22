@@ -2,6 +2,7 @@ import {
   addOrder,
   getCategories,
   getCurrentUser,
+  getFaqs,
   getOrders,
   getProducts,
   getSettings,
@@ -1615,17 +1616,49 @@ document.addEventListener('DOMContentLoaded', () => {
   initThemeToggle();
   initFloatingActions();
 
-  // Single-open FAQ progressive fallback
-  const faqItems = document.querySelectorAll('.faq-item');
-  faqItems.forEach((item) => {
-    item.addEventListener('toggle', () => {
-      if (item.open) {
-        faqItems.forEach((other) => {
-          if (other !== item && other.open) other.open = false;
-        });
-      }
+  // Apply dynamic settings & FAQs from Admin
+  if (SETTINGS.announcementText) {
+    const annEl = document.querySelector('.announcement-inner span');
+    if (annEl) annEl.textContent = SETTINGS.announcementText;
+  }
+  const heroTitleEl = document.querySelector('.hero-slide--red .slide-title');
+  if (heroTitleEl && SETTINGS.heroTitle) heroTitleEl.textContent = SETTINGS.heroTitle;
+  const heroDescEl = document.querySelector('.hero-slide--red .slide-desc');
+  if (heroDescEl && SETTINGS.heroDesc) heroDescEl.textContent = SETTINGS.heroDesc;
+  const subTitleEl = document.querySelector('.sublimation-copy h2');
+  if (subTitleEl && SETTINGS.sublimationTitle) subTitleEl.textContent = SETTINGS.sublimationTitle;
+  const subDescEl = document.querySelector('.sublimation-copy p');
+  if (subDescEl && SETTINGS.sublimationDesc) subDescEl.textContent = SETTINGS.sublimationDesc;
+  const whTitleEl = document.querySelector('.wholesale-copy h2');
+  if (whTitleEl && SETTINGS.wholesaleTitle) whTitleEl.textContent = SETTINGS.wholesaleTitle;
+  const whDescEl = document.querySelector('.wholesale-copy p');
+  if (whDescEl && SETTINGS.wholesaleDesc) whDescEl.textContent = SETTINGS.wholesaleDesc;
+  const whCta = document.querySelector('.wholesale-cta .btn-whatsapp');
+  if (whCta && SETTINGS.whatsappNumber) {
+    const waNum = SETTINGS.whatsappNumber.replace(/\D/g, '');
+    whCta.href = `https://wa.me/${waNum}?text=${encodeURIComponent('Hola Multirubro Expres! Quiero consultar por precios mayoristas.')}`;
+  }
+
+  const faqListEl = document.querySelector('.faq-list');
+  if (faqListEl) {
+    const faqs = getFaqs();
+    faqListEl.innerHTML = '';
+    faqs.forEach((f, idx) => {
+      const det = document.createElement('details');
+      det.className = 'faq-item';
+      det.setAttribute('name', 'faq');
+      if (idx === 0) det.open = true;
+      det.innerHTML = `<summary>${f.question}</summary><p>${f.answer}</p>`;
+      det.addEventListener('toggle', () => {
+        if (det.open) {
+          faqListEl.querySelectorAll('.faq-item').forEach((other) => {
+            if (other !== det && other.open) other.open = false;
+          });
+        }
+      });
+      faqListEl.appendChild(det);
     });
-  });
+  }
   renderHomeCategories();
   renderCategoryPills();
   renderProducts();

@@ -69,6 +69,12 @@
               </button>
             </li>
             <li>
+              <button type="button" class="nav-item" data-view="faqs">
+                <span class="nav-icon" aria-hidden="true">❓</span>
+                <span class="nav-text">Preguntas Frecuentes</span>
+              </button>
+            </li>
+            <li>
               <button type="button" class="nav-item" data-view="settings">
                 <span class="nav-icon" aria-hidden="true">⚙️</span>
                 <span class="nav-text">Configuración</span>
@@ -396,6 +402,29 @@
             </div>
           </section>
 
+          <!-- VIEW 6b: FAQS -->
+          <section class="admin-view" data-view-panel="faqs" hidden>
+            <div class="panel-card">
+              <div class="panel-header">
+                <h2 id="faqs-table-caption">Preguntas Frecuentes (Home)</h2>
+                <button type="button" class="btn-coral" id="add-faq-btn">+ Nueva Pregunta</button>
+              </div>
+              <div tabindex="0" role="region" aria-labelledby="faqs-table-caption" class="table-wrapper">
+                <table class="data-table faqs-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Pregunta</th>
+                      <th>Respuesta</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="faqs-table-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
           <!-- VIEW 7: SETTINGS -->
           <section class="admin-view" data-view-panel="settings" hidden>
             <div class="panel-card settings-card">
@@ -425,6 +454,35 @@
                   <span>Texto de barra de anuncios</span>
                   <input type="text" id="setting-announcement" />
                 </label>
+
+                <hr />
+                <h3>Textos de Secciones del Home</h3>
+                <div class="form-grid">
+                  <label class="form-field">
+                    <span>Título Banner Principal (Hero)</span>
+                    <input type="text" id="setting-hero-title" />
+                  </label>
+                  <label class="form-field">
+                    <span>Descripción Banner Principal</span>
+                    <input type="text" id="setting-hero-desc" />
+                  </label>
+                  <label class="form-field">
+                    <span>Título Sección Sublimación</span>
+                    <input type="text" id="setting-sub-title" />
+                  </label>
+                  <label class="form-field">
+                    <span>Descripción Sección Sublimación</span>
+                    <input type="text" id="setting-sub-desc" />
+                  </label>
+                  <label class="form-field">
+                    <span>Título Banner Mayorista</span>
+                    <input type="text" id="setting-wholesale-title" />
+                  </label>
+                  <label class="form-field">
+                    <span>Descripción Banner Mayorista</span>
+                    <input type="text" id="setting-wholesale-desc" />
+                  </label>
+                </div>
 
                 <div class="form-actions">
                   <button type="submit" class="btn-coral">Guardar Configuración</button>
@@ -489,6 +547,18 @@
             <span>Variantes (separadas por coma)</span>
             <input type="text" id="prod-variants" placeholder="Negro, Blanco, Rojo" />
           </label>
+          <label class="form-field">
+            <span>Descripción del producto</span>
+            <input type="text" id="prod-description" placeholder="Descripción breve para la ficha individual" />
+          </label>
+          <label class="form-field">
+            <span>URLs de Galería (opcional, separadas por coma)</span>
+            <input type="text" id="prod-gallery" placeholder="https://.../foto1.jpg, https://.../foto2.jpg" />
+          </label>
+          <label class="form-checkbox">
+            <input type="checkbox" id="prod-customizable" />
+            <span>Sublimable a pedido (habilita adjuntar diseño y cotizar en la ficha)</span>
+          </label>
         </div>
         <footer class="modal-footer">
           <button type="button" class="btn-outline-sm" id="product-modal-cancel">Cancelar</button>
@@ -535,6 +605,31 @@
         </header>
         <div class="modal-body" id="order-modal-body"></div>
       </div>
+    </dialog>
+
+    <!-- Modal FAQ (<dialog>) -->
+    <dialog class="admin-modal" id="faq-modal" aria-labelledby="faq-modal-title">
+      <form method="dialog" class="modal-card" id="faq-form">
+        <header class="modal-header">
+          <h3 id="faq-modal-title">Nueva Pregunta Frecuente</h3>
+          <button type="button" class="icon-btn" id="faq-modal-close" aria-label="Cerrar">✕</button>
+        </header>
+        <div class="modal-body">
+          <input type="hidden" id="faq-id" />
+          <label class="form-field">
+            <span>Pregunta</span>
+            <input type="text" id="faq-question" required />
+          </label>
+          <label class="form-field">
+            <span>Respuesta</span>
+            <input type="text" id="faq-answer" required />
+          </label>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn-outline-sm" id="faq-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn-coral">Guardar Pregunta</button>
+        </footer>
+      </form>
     </dialog>
 
     <script type="module" src="/src/admin.js"></script>
