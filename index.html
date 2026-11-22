@@ -584,19 +584,19 @@
             <span class="section-kicker">DUDAS FRECUENTES</span>
             <h2 class="section-title">Preguntas Frecuentes</h2>
             <div class="faq-list">
-              <details class="faq-item" open>
+              <details class="faq-item" name="faq" open>
                 <summary>¿Hay monto mínimo de compra mayorista?</summary>
                 <p>No exigimos compra mínima obligatoria en dinero. Podés acceder al precio mayorista llevando desde 3 unidades (o 6 en gorras) por producto.</p>
               </details>
-              <details class="faq-item">
+              <details class="faq-item" name="faq">
                 <summary>¿Hacen envíos a todo el país?</summary>
                 <p>Sí, despachamos en 24 hs hábiles por Correo Argentino, Andreani, expresos al interior y moto mensajería en el día para CABA y GBA.</p>
               </details>
-              <details class="faq-item">
+              <details class="faq-item" name="faq">
                 <summary>¿Cómo envío mi diseño para productos sublimables?</summary>
                 <p>Entrá a cualquier producto de la categoría Sublimación, adjuntá tu archivo (PNG, JPG, PDF, SVG, AI o CDR) y tocá "Enviar Diseño y Cotizar por WhatsApp".</p>
               </details>
-              <details class="faq-item">
+              <details class="faq-item" name="faq">
                 <summary>¿Qué medios de pago aceptan?</summary>
                 <p>Aceptamos transferencia bancaria, Mercado Pago, tarjetas y efectivo al retirar o por moto mensajería.</p>
               </details>
@@ -679,12 +679,16 @@
           <div class="pp-card">
             <div class="pp-layout">
               <div class="pp-gallery">
+                <div class="gallery-thumbs" id="pp-gallery-thumbs" aria-label="Miniaturas del producto"></div>
                 <div class="pp-media">
                   <div class="pp-visual" id="pp-visual"></div>
                   <div class="product-badges">
                     <span class="badge-discount" id="pp-discount-badge">-20%</span>
                     <span class="badge-tag" id="pp-tag-badge">Destacado</span>
                   </div>
+                  <button type="button" class="gal-nav-btn gal-nav-btn--prev" id="pp-gal-prev" aria-label="Imagen anterior">‹</button>
+                  <button type="button" class="gal-nav-btn gal-nav-btn--next" id="pp-gal-next" aria-label="Siguiente imagen">›</button>
+                  <span class="gal-counter" id="pp-gal-counter">1 / 3</span>
                 </div>
               </div>
 
@@ -1034,12 +1038,18 @@
 
         <div class="ProductModal-body">
           <div class="pd-main-grid">
-            <div class="pd-media">
-              <div class="pd-visual" id="pd-visual"></div>
-              <div class="product-badges">
-                <span class="badge-discount" id="pd-discount-badge">-20%</span>
-                <span class="badge-tag" id="pd-tag-badge">Destacado</span>
+            <div class="pd-gallery">
+              <div class="pd-media">
+                <div class="pd-visual" id="pd-visual"></div>
+                <div class="product-badges">
+                  <span class="badge-discount" id="pd-discount-badge">-20%</span>
+                  <span class="badge-tag" id="pd-tag-badge">Destacado</span>
+                </div>
+                <button type="button" class="gal-nav-btn gal-nav-btn--prev" id="pd-gal-prev" aria-label="Imagen anterior">‹</button>
+                <button type="button" class="gal-nav-btn gal-nav-btn--next" id="pd-gal-next" aria-label="Siguiente imagen">›</button>
+                <span class="gal-counter" id="pd-gal-counter">1 / 3</span>
               </div>
+              <div class="gallery-thumbs gallery-thumbs--row" id="pd-gallery-thumbs" aria-label="Miniaturas del producto"></div>
             </div>
 
             <div class="pd-info">

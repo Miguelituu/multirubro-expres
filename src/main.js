@@ -10,7 +10,7 @@ import {
   registerUser,
   updateUserProfile
 } from './data/store.js';
-import { renderProductVisual } from './data/visuals.js';
+import { getProductGallerySlides, renderProductVisual } from './data/visuals.js';
 
 const CATEGORIES = getCategories().filter((c) => c.active !== false);
 const PRODUCTS = getProducts().filter((p) => p.active !== false);
@@ -413,11 +413,16 @@ function createProductCard(product) {
   const isFav = state.wishlist.has(product.id);
   const activePrice = state.wholesaleView ? product.wholesalePrice : product.price;
 
+  const slides = getProductGallerySlides(product);
+  let activeSlide = 0;
+
+  const swatchColors = ['#1E293B', '#C8102E', '#0F766E'];
+
   const card = document.createElement('article');
   card.className = 'product-card';
   card.innerHTML = `
     <div class="product-media">
-      ${renderProductVisual(product)}
+      <div class="card-gallery-stage">${slides[0].html}</div>
       <div class="product-badges">
         <span class="badge-discount">-${product.discount}%</span>
         <span class="badge-tag">${product.badge}</span>
@@ -432,6 +437,11 @@ function createProductCard(product) {
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
         </svg>
       </button>
+      <button type="button" class="card-gal-arrow card-gal-arrow--prev" aria-label="Imagen anterior de ${product.title}">‹</button>
+      <button type="button" class="card-gal-arrow card-gal-arrow--next" aria-label="Siguiente imagen de ${product.title}">›</button>
+      <div class="card-gal-dots" aria-label="Galería del producto">
+        ${slides.map((s, i) => `<button type="button" class="card-gal-dot ${i === 0 ? 'is-active' : ''}" data-slide="${i}" aria-label="${s.label}"></button>`).join('')}
+      </div>
       <button type="button" class="quick-view-btn" aria-label="Vista rápida de ${product.title}">
         👁 Vista rápida
       </button>
@@ -439,6 +449,14 @@ function createProductCard(product) {
     <div class="product-body">
       <span class="product-category">${catName}</span>
       <h3 class="product-title">${product.title}</h3>
+      <div class="card-swatches" aria-label="Vistas / colores">
+        ${slides
+          .map(
+            (s, i) =>
+              `<button type="button" class="swatch-dot ${i === 0 ? 'is-active' : ''}" data-slide="${i}" style="background:${swatchColors[i % swatchColors.length]}" aria-label="${s.label}" title="${s.label}"></button>`
+          )
+          .join('')}
+      </div>
       <div class="product-variants">
         ${product.variants.map((v) => `<span class="variant-chip">${v}</span>`).join('')}
       </div>
@@ -452,6 +470,30 @@ function createProductCard(product) {
       </div>
     </div>
   `;
+
+  function setCardSlide(index) {
+    activeSlide = (index + slides.length) % slides.length;
+    card.querySelector('.card-gallery-stage').innerHTML = slides[activeSlide].html;
+    card.querySelectorAll('.card-gal-dot').forEach((d, idx) => d.classList.toggle('is-active', idx === activeSlide));
+    card.querySelectorAll('.swatch-dot').forEach((s, idx) => s.classList.toggle('is-active', idx === activeSlide));
+  }
+
+  card.querySelector('.card-gal-arrow--prev').addEventListener('click', (e) => {
+    e.stopPropagation();
+    setCardSlide(activeSlide - 1);
+  });
+
+  card.querySelector('.card-gal-arrow--next').addEventListener('click', (e) => {
+    e.stopPropagation();
+    setCardSlide(activeSlide + 1);
+  });
+
+  card.querySelectorAll('.card-gal-dot, .swatch-dot').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setCardSlide(Number(btn.dataset.slide));
+    });
+  });
 
   card.querySelector('.wishlist-btn').addEventListener('click', (e) => {
     e.stopPropagation();
@@ -934,6 +976,38 @@ function updateProductDetailPricing() {
     : `Mayorista (${activeDetailProduct.wholesaleMin}+ u.): ${formatARS(activeDetailProduct.wholesalePrice)} c/u`;
 }
 
+function mountDetailGallery(product, visualId, thumbsId, counterId, prevId, nextId) {
+  const slides = getProductGallerySlides(product);
+  let idx = 0;
+  const visualEl = document.getElementById(visualId);
+  const thumbsEl = document.getElementById(thumbsId);
+  const counterEl = document.getElementById(counterId);
+  const prevBtn = document.getElementById(prevId);
+  const nextBtn = document.getElementById(nextId);
+
+  function renderSlide(nextIdx) {
+    idx = (nextIdx + slides.length) % slides.length;
+    visualEl.innerHTML = slides[idx].html.replace('product-svg-art', 'detail-svg-art');
+    if (counterEl) counterEl.textContent = `${idx + 1} / ${slides.length}`;
+    thumbsEl.querySelectorAll('.gallery-thumb-btn').forEach((b, i) => b.classList.toggle('is-active', i === idx));
+  }
+
+  thumbsEl.innerHTML = '';
+  slides.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `gallery-thumb-btn ${i === 0 ? 'is-active' : ''}`;
+    btn.setAttribute('aria-label', s.label);
+    btn.innerHTML = s.html;
+    btn.addEventListener('click', () => renderSlide(i));
+    thumbsEl.appendChild(btn);
+  });
+
+  prevBtn.onclick = () => renderSlide(idx - 1);
+  nextBtn.onclick = () => renderSlide(idx + 1);
+  renderSlide(0);
+}
+
 function openProductDetail(product) {
   const modal = document.getElementById('product-detail-modal');
   activeDetailProduct = product;
@@ -943,7 +1017,7 @@ function openProductDetail(product) {
 
   const catName = CATEGORIES.find((c) => c.id === product.category)?.name || product.category;
   document.getElementById('pd-category-label').textContent = `${catName} · ${product.subcategory}`;
-  document.getElementById('pd-visual').innerHTML = renderProductVisual(product, 'detail-svg-art');
+  mountDetailGallery(product, 'pd-visual', 'pd-gallery-thumbs', 'pd-gal-counter', 'pd-gal-prev', 'pd-gal-next');
   document.getElementById('pd-discount-badge').textContent = `-${product.discount}%`;
   document.getElementById('pd-tag-badge').textContent = product.badge || 'Destacado';
   document.getElementById('pd-title').textContent = product.title;
@@ -1157,7 +1231,7 @@ function renderProductPage(product) {
   document.getElementById('pp-crumb-title').textContent = product.title;
 
   document.getElementById('pp-category-label').textContent = `${catName} · ${product.subcategory}`;
-  document.getElementById('pp-visual').innerHTML = renderProductVisual(product, 'detail-svg-art');
+  mountDetailGallery(product, 'pp-visual', 'pp-gallery-thumbs', 'pp-gal-counter', 'pp-gal-prev', 'pp-gal-next');
   document.getElementById('pp-discount-badge').textContent = `-${product.discount}%`;
   document.getElementById('pp-tag-badge').textContent = product.badge || 'Destacado';
   document.getElementById('pp-title').textContent = product.title;
@@ -1540,6 +1614,18 @@ document.addEventListener('DOMContentLoaded', () => {
   initCatalogPageView();
   initThemeToggle();
   initFloatingActions();
+
+  // Single-open FAQ progressive fallback
+  const faqItems = document.querySelectorAll('.faq-item');
+  faqItems.forEach((item) => {
+    item.addEventListener('toggle', () => {
+      if (item.open) {
+        faqItems.forEach((other) => {
+          if (other !== item && other.open) other.open = false;
+        });
+      }
+    });
+  });
   renderHomeCategories();
   renderCategoryPills();
   renderProducts();

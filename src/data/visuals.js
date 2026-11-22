@@ -118,11 +118,39 @@ const PRODUCT_SVGS = {
     </svg>`
 };
 
-export function renderProductVisual(product, className = 'product-svg-art') {
-  const accent = product.accent || '#c8102e';
+export function renderProductVisual(product, className = 'product-svg-art', accentOverride = null) {
+  const accent = accentOverride || product.accent || '#c8102e';
   const renderer = PRODUCT_SVGS[product.id];
   if (renderer) {
     return `<div class="${className}">${renderer(accent)}</div>`;
   }
   return `<span class="product-emoji" role="img" aria-label="${product.title}">${product.emoji || '📦'}</span>`;
+}
+
+export function getProductGallerySlides(product) {
+  if (Array.isArray(product.gallery) && product.gallery.length > 0) {
+    return product.gallery.map((url, idx) => ({
+      label: `Vista ${idx + 1}`,
+      html: `<img src="${url}" alt="${product.title} - Vista ${idx + 1}" loading="lazy" class="gallery-real-img" />`
+    }));
+  }
+
+  const baseAccent = product.accent || '#c8102e';
+  const altAccent = baseAccent === '#1E293B' ? '#C8102E' : '#1E293B';
+  const tertiaryAccent = '#0F766E';
+
+  return [
+    {
+      label: 'Vista Principal',
+      html: renderProductVisual(product, 'product-svg-art', baseAccent)
+    },
+    {
+      label: product.variants?.[1] ? `Variante: ${product.variants[1]}` : 'Color Alternativo',
+      html: renderProductVisual(product, 'product-svg-art', altAccent)
+    },
+    {
+      label: product.category === 'sublimacion' ? 'Detalle Estampa' : 'Vista Mayorista',
+      html: renderProductVisual(product, 'product-svg-art', tertiaryAccent)
+    }
+  ];
 }
