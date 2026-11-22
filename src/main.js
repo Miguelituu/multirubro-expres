@@ -10,6 +10,7 @@ import {
   registerUser,
   updateUserProfile
 } from './data/store.js';
+import { renderProductVisual } from './data/visuals.js';
 
 const CATEGORIES = getCategories().filter((c) => c.active !== false);
 const PRODUCTS = getProducts().filter((p) => p.active !== false);
@@ -416,7 +417,7 @@ function createProductCard(product) {
   card.className = 'product-card';
   card.innerHTML = `
     <div class="product-media">
-      <span class="product-emoji" role="img" aria-label="${product.title}">${product.emoji}</span>
+      ${renderProductVisual(product)}
       <div class="product-badges">
         <span class="badge-discount">-${product.discount}%</span>
         <span class="badge-tag">${product.badge}</span>
@@ -561,7 +562,7 @@ function updateCartUI() {
     const row = document.createElement('div');
     row.className = 'cart-item';
     row.innerHTML = `
-      <div class="cart-item-thumb" aria-hidden="true">${product.emoji}</div>
+      <div class="cart-item-thumb" aria-hidden="true">${renderProductVisual(product, 'thumb-svg-art')}</div>
       <div class="cart-item-info">
         <h4>${product.title}</h4>
         <div class="cart-item-price">
@@ -730,7 +731,7 @@ function renderAccountModalContent() {
       const row = document.createElement('div');
       row.className = 'account-fav-item';
       row.innerHTML = `
-        <span class="account-fav-emoji" aria-hidden="true">${p.emoji}</span>
+        <div class="account-fav-thumb" aria-hidden="true">${renderProductVisual(p, 'thumb-svg-art')}</div>
         <div>
           <strong>${p.title}</strong>
           <div class="cart-item-price">${formatARS(p.price)} · Mayorista ${formatARS(p.wholesalePrice)}</div>
@@ -942,7 +943,7 @@ function openProductDetail(product) {
 
   const catName = CATEGORIES.find((c) => c.id === product.category)?.name || product.category;
   document.getElementById('pd-category-label').textContent = `${catName} · ${product.subcategory}`;
-  document.getElementById('pd-emoji').textContent = product.emoji || '📦';
+  document.getElementById('pd-visual').innerHTML = renderProductVisual(product, 'detail-svg-art');
   document.getElementById('pd-discount-badge').textContent = `-${product.discount}%`;
   document.getElementById('pd-tag-badge').textContent = product.badge || 'Destacado';
   document.getElementById('pd-title').textContent = product.title;
@@ -1145,7 +1146,7 @@ function renderProductPage(product) {
   document.getElementById('pp-crumb-title').textContent = product.title;
 
   document.getElementById('pp-category-label').textContent = `${catName} · ${product.subcategory}`;
-  document.getElementById('pp-emoji').textContent = product.emoji || '📦';
+  document.getElementById('pp-visual').innerHTML = renderProductVisual(product, 'detail-svg-art');
   document.getElementById('pp-discount-badge').textContent = `-${product.discount}%`;
   document.getElementById('pp-tag-badge').textContent = product.badge || 'Destacado';
   document.getElementById('pp-title').textContent = product.title;

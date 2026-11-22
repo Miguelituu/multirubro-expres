@@ -1300,17 +1300,19 @@ select {
 .product-card {
   container-type: inline-size;
   background: var(--surface-card);
-  border: 1px solid var(--border-light);
+  border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: var(--radius-md);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
+  transform: translateY(-4px);
+  border-color: rgba(200, 16, 46, 0.25);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.1);
 }
 
 .product-media {
@@ -1319,8 +1321,47 @@ select {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #f1f5f9;
   overflow: hidden;
+  padding: 1rem;
+}
+
+.product-svg-art {
+  width: 78%;
+  height: 78%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.product-card:hover .product-svg-art {
+  transform: scale(1.06);
+}
+
+.product-svg-art svg,
+.detail-svg-art svg,
+.thumb-svg-art svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.detail-svg-art {
+  width: 82%;
+  height: 82%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumb-svg-art {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .product-emoji {
@@ -1402,6 +1443,11 @@ select {
   font-weight: 700;
   line-height: 1.35;
   color: var(--text-main);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.7em;
 }
 
 .product-variants {
@@ -1443,10 +1489,15 @@ select {
 }
 
 .price-wholesale {
-  margin: 0.2rem 0 0;
-  font-size: 0.8rem;
+  margin: 0.35rem 0 0;
+  font-size: 0.76rem;
   color: #15803d;
-  font-weight: 600;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  width: fit-content;
+  font-weight: 700;
 }
 
 .add-to-cart-btn {
@@ -2115,7 +2166,18 @@ select {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-md);
-  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.pd-visual,
+.pp-visual {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2418,10 +2480,12 @@ select {
   position: relative;
   aspect-ratio: 1 / 1;
   border-radius: var(--radius-md);
-  background: linear-gradient(145deg, #f8fafc 0%, #e2e8f0 100%);
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, #f1f5f9 100%);
+  border: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem;
 }
 
 .pp-emoji {
