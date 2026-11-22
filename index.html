@@ -223,6 +223,7 @@
     </dialog>
 
     <main id="inicio">
+      <div id="home-view">
       <!-- Sección Hero Principal: Sidebar Categorías + Carrusel Central + 2 Banners Laterales -->
       <section class="hero-section">
         <div class="container hero-grid">
@@ -487,6 +488,137 @@
             >
               Consultar Mayorista por WhatsApp
             </a>
+          </div>
+        </div>
+      </section>
+      </div>
+
+      <!-- Vista Completa de Producto (SPA Route: #/producto/<id>) -->
+      <section id="product-page-view" class="product-page-section" hidden aria-labelledby="pp-title">
+        <div class="container">
+          <nav class="pp-breadcrumb" aria-label="Ruta de navegación">
+            <button type="button" class="pp-back-btn" id="pp-back-btn">← Volver al catálogo</button>
+            <span class="pp-crumb-sep" aria-hidden="true">/</span>
+            <button type="button" class="pp-crumb-cat" id="pp-crumb-cat">Categoría</button>
+            <span class="pp-crumb-sep" aria-hidden="true">/</span>
+            <span class="pp-crumb-current" id="pp-crumb-title">Producto</span>
+          </nav>
+
+          <div class="pp-card">
+            <div class="pp-layout">
+              <div class="pp-gallery">
+                <div class="pp-media">
+                  <span class="pp-emoji" id="pp-emoji" role="img" aria-label="Producto">📦</span>
+                  <div class="product-badges">
+                    <span class="badge-discount" id="pp-discount-badge">-20%</span>
+                    <span class="badge-tag" id="pp-tag-badge">Destacado</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pp-details">
+                <span class="pd-header-cat" id="pp-category-label">Categoría</span>
+                <h1 class="pp-title" id="pp-title">Nombre del producto</h1>
+                <p class="pp-desc" id="pp-desc"></p>
+
+                <div class="pd-pricing-box">
+                  <div class="price-row">
+                    <span class="price-current" id="pp-current-price">$0</span>
+                    <span class="price-old" id="pp-old-price">$0</span>
+                  </div>
+                  <p class="price-wholesale" id="pp-wholesale-info"></p>
+                </div>
+
+                <div class="pd-variants-wrap">
+                  <span class="pd-label">Variante / Color:</span>
+                  <div class="pd-variants" id="pp-variants"></div>
+                </div>
+
+                <div class="pd-qty-actions">
+                  <div class="pd-qty-stepper" aria-label="Cantidad">
+                    <button type="button" id="pp-qty-dec" aria-label="Restar unidad">-</button>
+                    <span id="pp-qty-val">1</span>
+                    <button type="button" id="pp-qty-inc" aria-label="Sumar unidad">+</button>
+                  </div>
+                  <button type="button" class="btn-primary pd-add-btn" id="pp-add-to-cart-btn">Agregar al carrito</button>
+                  <button type="button" class="pp-fav-btn" id="pp-wishlist-btn" aria-label="Guardar en favoritos" aria-pressed="false">
+                    ♡ Favorito
+                  </button>
+                </div>
+
+                <div class="pp-trust-mini">
+                  <span>🚚 Envíos a todo el país</span>
+                  <span>🏷️ Descuento mayorista automático</span>
+                  <span>💬 Soporte directo por WhatsApp</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bloque exclusivo para Sublimables a Pedido en página completa -->
+            <section class="pd-custom-box" id="pp-custom-section" hidden>
+              <div class="pd-custom-head">
+                <span class="pd-custom-badge">SUBLIMABLES A PEDIDO</span>
+                <h2>Enviá tu diseño y datos para cotizar o pedir</h2>
+                <p>Adjuntá tu logo, imagen o archivo de diseño junto con tus datos y te respondemos al instante por WhatsApp.</p>
+              </div>
+
+              <form id="pp-quote-form" class="account-form">
+                <div class="pd-upload-row">
+                  <label class="pd-file-drop" for="pp-design-file">
+                    <span class="pd-file-icon" aria-hidden="true">📎</span>
+                    <span id="pp-file-label">Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)</span>
+                    <input
+                      type="file"
+                      id="pp-design-file"
+                      accept="image/*,.pdf,.svg,.ai,.cdr"
+                      class="visually-hidden"
+                    />
+                  </label>
+
+                  <div class="pd-design-preview" id="pp-design-preview-wrap" hidden>
+                    <img id="pp-design-preview-img" alt="Vista previa de tu diseño" />
+                    <span id="pp-design-file-meta"></span>
+                  </div>
+                </div>
+
+                <label class="account-field">
+                  <span>Indicaciones del diseño (ubicación, talles, cantidad, texto)</span>
+                  <textarea
+                    id="pp-design-notes"
+                    rows="3"
+                    placeholder="Ej: Logo centrado en el frente 10x10 cm, 12 unidades surtidas..."
+                    required
+                  ></textarea>
+                </label>
+
+                <div class="account-form-grid">
+                  <label class="account-field">
+                    <span>Tu nombre</span>
+                    <input type="text" id="pp-client-name" required placeholder="Nombre y apellido" />
+                  </label>
+                  <label class="account-field">
+                    <span>Teléfono / WhatsApp</span>
+                    <input type="tel" id="pp-client-phone" required placeholder="11 5555-0000" />
+                  </label>
+                  <label class="account-field">
+                    <span>Email (opcional)</span>
+                    <input type="email" id="pp-client-email" placeholder="tu@email.com" />
+                  </label>
+                </div>
+
+                <div class="pd-quote-actions">
+                  <button type="submit" class="btn-whatsapp full-width" id="pp-send-quote-btn">
+                    Enviar Diseño y Cotizar por WhatsApp
+                  </button>
+                </div>
+                <p class="account-success" id="pp-quote-feedback" role="status" aria-live="polite"></p>
+              </form>
+            </section>
+          </div>
+
+          <div class="pp-related">
+            <h2>Productos relacionados</h2>
+            <div class="products-grid" id="pp-related-grid"></div>
           </div>
         </div>
       </section>

@@ -231,6 +231,7 @@ function selectCategory(categoryId, subcategory = null) {
   state.subcategory = subcategory;
   state.onlyOffers = false;
   state.onlyWishlist = false;
+  showHomeView();
   renderCategoryPills();
   renderProducts();
   document.getElementById('search-category').value = categoryId;
@@ -406,6 +407,83 @@ function getFilteredProducts() {
   return list;
 }
 
+function createProductCard(product) {
+  const catName = CATEGORIES.find((c) => c.id === product.category)?.name || product.category;
+  const isFav = state.wishlist.has(product.id);
+  const activePrice = state.wholesaleView ? product.wholesalePrice : product.price;
+
+  const card = document.createElement('article');
+  card.className = 'product-card';
+  card.innerHTML = `
+    <div class="product-media">
+      <span class="product-emoji" role="img" aria-label="${product.title}">${product.emoji}</span>
+      <div class="product-badges">
+        <span class="badge-discount">-${product.discount}%</span>
+        <span class="badge-tag">${product.badge}</span>
+      </div>
+      <button
+        type="button"
+        class="wishlist-btn"
+        aria-label="Guardar ${product.title} en favoritos"
+        aria-pressed="${isFav}"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+      <button type="button" class="quick-view-btn" aria-label="Vista rápida de ${product.title}">
+        👁 Vista rápida
+      </button>
+    </div>
+    <div class="product-body">
+      <span class="product-category">${catName}</span>
+      <h3 class="product-title">${product.title}</h3>
+      <div class="product-variants">
+        ${product.variants.map((v) => `<span class="variant-chip">${v}</span>`).join('')}
+      </div>
+      <div class="product-pricing">
+        <div class="price-row">
+          <span class="price-current">${formatARS(activePrice)}</span>
+          <span class="price-old">${formatARS(product.originalPrice)}</span>
+        </div>
+        <p class="price-wholesale">Mayorista (${product.wholesaleMin}+ u.): ${formatARS(product.wholesalePrice)}</p>
+        <button type="button" class="add-to-cart-btn">Agregar al carrito</button>
+      </div>
+    </div>
+  `;
+
+  card.querySelector('.wishlist-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (state.wishlist.has(product.id)) state.wishlist.delete(product.id);
+    else state.wishlist.add(product.id);
+    document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
+    const user = getCurrentUser();
+    if (user) {
+      updateUserProfile(user.email, { wishlist: Array.from(state.wishlist) });
+    }
+    renderProducts();
+  });
+
+  card.querySelector('.quick-view-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openProductDetail(product);
+  });
+
+  card.querySelector('.product-media').addEventListener('click', () => {
+    navigateToProduct(product.id);
+  });
+
+  card.querySelector('.product-title').addEventListener('click', () => {
+    navigateToProduct(product.id);
+  });
+
+  card.querySelector('.add-to-cart-btn').addEventListener('click', () => {
+    addToCart(product, 1);
+  });
+
+  return card;
+}
+
 function renderProducts() {
   const grid = document.getElementById('products-grid');
   const emptyState = document.getElementById('empty-state');
@@ -432,75 +510,7 @@ function renderProducts() {
   emptyState.hidden = true;
 
   const fragment = document.createDocumentFragment();
-  items.forEach((product) => {
-    const catName = CATEGORIES.find((c) => c.id === product.category)?.name || product.category;
-    const isFav = state.wishlist.has(product.id);
-    const activePrice = state.wholesaleView ? product.wholesalePrice : product.price;
-
-    const card = document.createElement('article');
-    card.className = 'product-card';
-    card.innerHTML = `
-      <div class="product-media">
-        <span class="product-emoji" role="img" aria-label="${product.title}">${product.emoji}</span>
-        <div class="product-badges">
-          <span class="badge-discount">-${product.discount}%</span>
-          <span class="badge-tag">${product.badge}</span>
-        </div>
-        <button
-          type="button"
-          class="wishlist-btn"
-          aria-label="Guardar ${product.title} en favoritos"
-          aria-pressed="${isFav}"
-        >
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-          </svg>
-        </button>
-      </div>
-      <div class="product-body">
-        <span class="product-category">${catName}</span>
-        <h3 class="product-title">${product.title}</h3>
-        <div class="product-variants">
-          ${product.variants.map((v) => `<span class="variant-chip">${v}</span>`).join('')}
-        </div>
-        <div class="product-pricing">
-          <div class="price-row">
-            <span class="price-current">${formatARS(activePrice)}</span>
-            <span class="price-old">${formatARS(product.originalPrice)}</span>
-          </div>
-          <p class="price-wholesale">Mayorista (${product.wholesaleMin}+ u.): ${formatARS(product.wholesalePrice)}</p>
-          <button type="button" class="add-to-cart-btn">Agregar al carrito</button>
-        </div>
-      </div>
-    `;
-
-    card.querySelector('.wishlist-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (state.wishlist.has(product.id)) state.wishlist.delete(product.id);
-      else state.wishlist.add(product.id);
-      document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
-      const user = getCurrentUser();
-      if (user) {
-        updateUserProfile(user.email, { wishlist: Array.from(state.wishlist) });
-      }
-      renderProducts();
-    });
-
-    card.querySelector('.product-media').addEventListener('click', () => {
-      openProductDetail(product);
-    });
-
-    card.querySelector('.product-title').addEventListener('click', () => {
-      openProductDetail(product);
-    });
-
-    card.querySelector('.add-to-cart-btn').addEventListener('click', () => {
-      addToCart(product, 1, product.variants?.[0] || null);
-    });
-
-    fragment.appendChild(card);
-  });
-
+  items.forEach((product) => fragment.appendChild(createProductCard(product)));
   grid.appendChild(fragment);
 }
 
@@ -1090,6 +1100,249 @@ function initProductDetailModal() {
 }
 
 /* =========================================================
+   5d. SPA Router & Full Product Page View (#/producto/<id>)
+   ========================================================= */
+let pageProduct = null;
+let pageQty = 1;
+let pageVariant = '';
+let pageDesignFileName = '';
+
+function showHomeView() {
+  document.getElementById('home-view').hidden = false;
+  document.getElementById('product-page-view').hidden = true;
+  if (window.location.hash.startsWith('#/producto/')) {
+    history.pushState(null, '', '#/');
+  }
+}
+
+function navigateToProduct(productId) {
+  window.location.hash = `#/producto/${productId}`;
+}
+
+function updateProductPagePricing() {
+  if (!pageProduct) return;
+  const isWholesale = pageQty >= pageProduct.wholesaleMin;
+  const unitPrice = isWholesale ? pageProduct.wholesalePrice : pageProduct.price;
+  document.getElementById('pp-qty-val').textContent = String(pageQty);
+  document.getElementById('pp-current-price').textContent = formatARS(unitPrice);
+  document.getElementById('pp-old-price').textContent = formatARS(pageProduct.originalPrice);
+  document.getElementById('pp-wholesale-info').textContent = isWholesale
+    ? `✓ Precio mayorista aplicado (${pageProduct.wholesaleMin}+ u.) · Subtotal: ${formatARS(unitPrice * pageQty)}`
+    : `Mayorista (${pageProduct.wholesaleMin}+ u.): ${formatARS(pageProduct.wholesalePrice)} c/u`;
+}
+
+function renderProductPage(product) {
+  pageProduct = product;
+  pageQty = 1;
+  pageVariant = product.variants?.[0] || 'Estándar';
+  pageDesignFileName = '';
+
+  const catObj = CATEGORIES.find((c) => c.id === product.category);
+  const catName = catObj?.name || product.category;
+
+  document.getElementById('pp-crumb-cat').textContent = catName;
+  document.getElementById('pp-crumb-cat').onclick = () => selectCategory(product.category);
+  document.getElementById('pp-crumb-title').textContent = product.title;
+
+  document.getElementById('pp-category-label').textContent = `${catName} · ${product.subcategory}`;
+  document.getElementById('pp-emoji').textContent = product.emoji || '📦';
+  document.getElementById('pp-discount-badge').textContent = `-${product.discount}%`;
+  document.getElementById('pp-tag-badge').textContent = product.badge || 'Destacado';
+  document.getElementById('pp-title').textContent = product.title;
+  document.getElementById('pp-desc').textContent =
+    product.description || 'Producto disponible para venta minorista y mayorista con envíos a todo el país.';
+
+  const variantsEl = document.getElementById('pp-variants');
+  variantsEl.innerHTML = '';
+  (product.variants || ['Único']).forEach((variant, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `pd-variant-pill ${idx === 0 ? 'is-selected' : ''}`;
+    btn.textContent = variant;
+    btn.addEventListener('click', () => {
+      pageVariant = variant;
+      variantsEl.querySelectorAll('.pd-variant-pill').forEach((b) => b.classList.toggle('is-selected', b === btn));
+    });
+    variantsEl.appendChild(btn);
+  });
+
+  const favBtn = document.getElementById('pp-wishlist-btn');
+  const isFav = state.wishlist.has(product.id);
+  favBtn.setAttribute('aria-pressed', String(isFav));
+  favBtn.textContent = isFav ? '♥ En Favoritos' : '♡ Favorito';
+
+  updateProductPagePricing();
+
+  // Sublimables a pedido section
+  const isSublimable = product.category === 'sublimacion' || Boolean(product.customizable);
+  document.getElementById('pp-custom-section').hidden = !isSublimable;
+  document.getElementById('pp-quote-feedback').textContent = '';
+  document.getElementById('pp-design-notes').value = '';
+  document.getElementById('pp-design-file').value = '';
+  document.getElementById('pp-file-label').textContent = 'Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)';
+  document.getElementById('pp-design-preview-wrap').hidden = true;
+
+  if (isSublimable) {
+    const user = getCurrentUser();
+    document.getElementById('pp-client-name').value = user?.name || '';
+    document.getElementById('pp-client-phone').value = user?.phone || '';
+    document.getElementById('pp-client-email').value = user?.email || '';
+  }
+
+  // Related products
+  const relatedGrid = document.getElementById('pp-related-grid');
+  relatedGrid.innerHTML = '';
+  const related = PRODUCTS.filter((p) => p.id !== product.id && p.category === product.category)
+    .concat(PRODUCTS.filter((p) => p.id !== product.id && p.category !== product.category))
+    .slice(0, 4);
+  related.forEach((p) => relatedGrid.appendChild(createProductCard(p)));
+
+  document.getElementById('home-view').hidden = true;
+  document.getElementById('product-page-view').hidden = false;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handleRoute() {
+  const hash = window.location.hash;
+  if (hash.startsWith('#/producto/')) {
+    const id = hash.replace('#/producto/', '').trim();
+    const product = PRODUCTS.find((p) => p.id === id);
+    if (product) {
+      renderProductPage(product);
+      return;
+    }
+  }
+  document.getElementById('home-view').hidden = false;
+  document.getElementById('product-page-view').hidden = true;
+}
+
+function initProductPageView() {
+  document.getElementById('pp-back-btn')?.addEventListener('click', () => {
+    showHomeView();
+    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' });
+  });
+
+  document.getElementById('pp-qty-dec')?.addEventListener('click', () => {
+    if (pageQty > 1) {
+      pageQty -= 1;
+      updateProductPagePricing();
+    }
+  });
+
+  document.getElementById('pp-qty-inc')?.addEventListener('click', () => {
+    pageQty += 1;
+    updateProductPagePricing();
+  });
+
+  document.getElementById('pp-add-to-cart-btn')?.addEventListener('click', () => {
+    if (!pageProduct) return;
+    addToCart(pageProduct, pageQty);
+  });
+
+  document.getElementById('pp-wishlist-btn')?.addEventListener('click', () => {
+    if (!pageProduct) return;
+    if (state.wishlist.has(pageProduct.id)) state.wishlist.delete(pageProduct.id);
+    else state.wishlist.add(pageProduct.id);
+    document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
+    const user = getCurrentUser();
+    if (user) updateUserProfile(user.email, { wishlist: Array.from(state.wishlist) });
+    const isFav = state.wishlist.has(pageProduct.id);
+    const favBtn = document.getElementById('pp-wishlist-btn');
+    favBtn.setAttribute('aria-pressed', String(isFav));
+    favBtn.textContent = isFav ? '♥ En Favoritos' : '♡ Favorito';
+  });
+
+  document.getElementById('pp-design-file')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    const previewWrap = document.getElementById('pp-design-preview-wrap');
+    const previewImg = document.getElementById('pp-design-preview-img');
+    const metaEl = document.getElementById('pp-design-file-meta');
+    const labelEl = document.getElementById('pp-file-label');
+
+    if (!file) {
+      pageDesignFileName = '';
+      previewWrap.hidden = true;
+      labelEl.textContent = 'Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)';
+      return;
+    }
+
+    pageDesignFileName = file.name;
+    const sizeKB = Math.max(1, Math.round(file.size / 1024));
+    labelEl.textContent = `Archivo seleccionado: ${file.name}`;
+    metaEl.textContent = `${file.name} (${sizeKB} KB)`;
+    previewWrap.hidden = false;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImg.src = String(reader.result);
+        previewImg.hidden = false;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewImg.hidden = true;
+    }
+  });
+
+  document.getElementById('pp-quote-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!pageProduct) return;
+
+    const clientName = document.getElementById('pp-client-name').value.trim();
+    const clientPhone = document.getElementById('pp-client-phone').value.trim();
+    const clientEmail = document.getElementById('pp-client-email').value.trim();
+    const notes = document.getElementById('pp-design-notes').value.trim();
+    const isWholesale = pageQty >= pageProduct.wholesaleMin;
+    const unitPrice = isWholesale ? pageProduct.wholesalePrice : pageProduct.price;
+    const total = unitPrice * pageQty;
+
+    const currentUser = getCurrentUser();
+    const quoteId = `COT-${String(Math.floor(100000 + Math.random() * 900000))}`;
+
+    addOrder({
+      id: quoteId,
+      date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      userEmail: currentUser?.email || clientEmail || null,
+      customer: clientName,
+      phone: clientPhone,
+      itemsCount: pageQty,
+      total,
+      paymentMethod: 'Cotización Sublimado',
+      status: 'Pendiente',
+      isCustomDesign: true,
+      designFileName: pageDesignFileName || 'Sin archivo adjunto (envía por WhatsApp)',
+      designNotes: notes,
+      items: [
+        {
+          title: `${pageProduct.title} [${pageVariant}] — Diseño: ${pageDesignFileName || 'A enviar'}`,
+          qty: pageQty,
+          unitPrice
+        }
+      ]
+    });
+
+    const msgLines = [
+      `Hola Multirubro Expres! Quiero cotizar/pedir un producto sublimable (${quoteId}):`,
+      `- Producto: ${pageProduct.title}`,
+      `- Variante: ${pageVariant}`,
+      `- Cantidad: ${pageQty} u. (${formatARS(total)} aprox.)`,
+      `- Archivo de diseño: ${pageDesignFileName || 'Lo envío por este chat'}`,
+      `- Indicaciones: ${notes}`,
+      `- Cliente: ${clientName} | Tel: ${clientPhone}${clientEmail ? ` | Email: ${clientEmail}` : ''}`
+    ];
+
+    const waNum = (SETTINGS.whatsappNumber || '5491100000000').replace(/\D/g, '');
+    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(msgLines.join('\n'))}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+    document.getElementById('pp-quote-feedback').textContent =
+      `✓ Cotización ${quoteId} registrada. Si no se abrió WhatsApp automáticamente, revisá las ventanas emergentes.`;
+  });
+
+  window.addEventListener('hashchange', handleRoute);
+}
+
+/* =========================================================
    6. Bootstrap App
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1102,9 +1355,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initCartDrawer();
   initAccountModal(mobileDrawerApi);
   initProductDetailModal();
+  initProductPageView();
   renderCategoryPills();
   renderProducts();
   updateCartUI();
+  handleRoute();
 
   // Search form
   document.getElementById('search-form')?.addEventListener('submit', (e) => {
