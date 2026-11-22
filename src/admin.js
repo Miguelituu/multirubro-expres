@@ -420,11 +420,15 @@ function renderProducts() {
 
   filtered.forEach((prod, idx) => {
     const catName = categories.find((c) => c.id === prod.category)?.name || prod.category;
+    const thumbHtml =
+      Array.isArray(prod.gallery) && prod.gallery.length > 0
+        ? `<img src="${prod.gallery[0]}" alt="" class="admin-prod-thumb-img" />`
+        : `${prod.emoji || '📦'} `;
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <th>${idx + 1}</th>
-      <td data-label="Producto">${prod.emoji || '📦'} <strong>${prod.title}</strong></td>
+      <td data-label="Producto">${thumbHtml}<strong>${prod.title}</strong></td>
       <td data-label="Categoría">${catName}</td>
       <td data-label="Minorista">${formatARS(prod.price)}</td>
       <td data-label="Mayorista">${formatARS(prod.wholesalePrice)} (${prod.wholesaleMin}+)</td>
@@ -482,6 +486,75 @@ function renderProducts() {
   });
 }
 
+let uploadedGalleryImages = [];
+
+function compressImageFile(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const maxSide = 800;
+        let { width, height } = img;
+        if (width > maxSide || height > maxSide) {
+          if (width >= height) {
+            height = Math.round((height * maxSide) / width);
+            width = maxSide;
+          } else {
+            width = Math.round((width * maxSide) / height);
+            height = maxSide;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const webp = canvas.toDataURL('image/webp', 0.82);
+        resolve(webp.startsWith('data:image/webp') ? webp : canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = () => resolve(String(reader.result));
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function getGalleryUrlsFromInput() {
+  return document
+    .getElementById('prod-gallery')
+    .value.split(',')
+    .map((u) => u.trim())
+    .filter(Boolean);
+}
+
+function renderAdminGalleryPreview() {
+  const container = document.getElementById('prod-gallery-preview');
+  if (!container) return;
+  container.innerHTML = '';
+
+  uploadedGalleryImages.forEach((src, idx) => {
+    const box = document.createElement('div');
+    box.className = 'admin-gallery-thumb';
+    box.innerHTML = `
+      <img src="${src}" alt="Imagen subida ${idx + 1}" />
+      <button type="button" class="admin-gallery-remove" aria-label="Quitar imagen ${idx + 1}">✕</button>
+    `;
+    box.querySelector('.admin-gallery-remove').addEventListener('click', () => {
+      uploadedGalleryImages.splice(idx, 1);
+      renderAdminGalleryPreview();
+    });
+    container.appendChild(box);
+  });
+
+  getGalleryUrlsFromInput().forEach((url, idx) => {
+    const box = document.createElement('div');
+    box.className = 'admin-gallery-thumb';
+    box.innerHTML = `<img src="${url}" alt="URL de galería ${idx + 1}" />`;
+    container.appendChild(box);
+  });
+}
+
 function openProductModal(prod = null) {
   const modal = document.getElementById('product-modal');
   const catSelect = document.getElementById('prod-category');
@@ -492,6 +565,10 @@ function openProductModal(prod = null) {
     opt.textContent = c.name;
     catSelect.appendChild(opt);
   });
+
+  const allGallery = prod && Array.isArray(prod.gallery) ? prod.gallery : [];
+  uploadedGalleryImages = allGallery.filter((src) => src.startsWith('data:'));
+  const externalUrls = allGallery.filter((src) => !src.startsWith('data:'));
 
   document.getElementById('product-modal-title').textContent = prod ? 'Editar Producto' : 'Nuevo Producto';
   document.getElementById('prod-id').value = prod ? prod.id : '';
@@ -506,8 +583,10 @@ function openProductModal(prod = null) {
   document.getElementById('prod-emoji').value = prod ? prod.emoji || '📦' : '📦';
   document.getElementById('prod-variants').value = prod ? (prod.variants || []).join(', ') : 'Negro, Blanco';
   document.getElementById('prod-description').value = prod ? prod.description || '' : '';
-  document.getElementById('prod-gallery').value = prod && Array.isArray(prod.gallery) ? prod.gallery.join(', ') : '';
+  document.getElementById('prod-gallery').value = externalUrls.join(', ');
+  document.getElementById('prod-gallery-files').value = '';
   document.getElementById('prod-customizable').checked = Boolean(prod?.customizable);
+  renderAdminGalleryPreview();
   modal.showModal();
 }
 
@@ -693,6 +772,20 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('product-modal-close')?.addEventListener('click', () => prodModal.close());
   document.getElementById('product-modal-cancel')?.addEventListener('click', () => prodModal.close());
 
+  document.getElementById('prod-gallery-files')?.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        const dataUrl = await compressImageFile(file);
+        uploadedGalleryImages.push(dataUrl);
+      }
+    }
+    e.target.value = '';
+    renderAdminGalleryPreview();
+  });
+
+  document.getElementById('prod-gallery')?.addEventListener('input', renderAdminGalleryPreview);
+
   document.getElementById('product-form')?.addEventListener('submit', (e) => {
     e.preventDefault();
     const id = document.getElementById('prod-id').value;
@@ -717,11 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .map((v) => v.trim())
         .filter(Boolean),
       description: document.getElementById('prod-description').value.trim(),
-      gallery: document
-        .getElementById('prod-gallery')
-        .value.split(',')
-        .map((u) => u.trim())
-        .filter(Boolean),
+      gallery: [...uploadedGalleryImages, ...getGalleryUrlsFromInput()],
       customizable: document.getElementById('prod-customizable').checked,
       active: true
     };

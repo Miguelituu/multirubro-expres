@@ -551,9 +551,17 @@
             <span>Descripción del producto</span>
             <input type="text" id="prod-description" placeholder="Descripción breve para la ficha individual" />
           </label>
+          <div class="form-field">
+            <span>Imágenes del Producto (subir archivos o pegar URLs/rutas)</span>
+            <label class="admin-upload-box" for="prod-gallery-files">
+              <span>📷 Subir imágenes desde tu dispositivo (JPG, PNG, WebP)</span>
+              <input type="file" id="prod-gallery-files" accept="image/*" multiple class="visually-hidden" />
+            </label>
+            <div class="admin-gallery-preview" id="prod-gallery-preview"></div>
+          </div>
           <label class="form-field">
-            <span>URLs de Galería (opcional, separadas por coma)</span>
-            <input type="text" id="prod-gallery" placeholder="https://.../foto1.jpg, https://.../foto2.jpg" />
+            <span>URLs o rutas de Galería (opcional, separadas por coma)</span>
+            <input type="text" id="prod-gallery" placeholder="/images/productos/foto1.jpg, https://.../foto2.jpg" />
           </label>
           <label class="form-checkbox">
             <input type="checkbox" id="prod-customizable" />
