@@ -715,6 +715,121 @@
       </div>
     </dialog>
 
+    <!-- Vista Individual de Producto (<dialog>) -->
+    <dialog class="ProductModal" id="product-detail-modal" aria-labelledby="pd-title">
+      <div class="ProductModal-card">
+        <header class="AccountModal-header">
+          <span class="pd-header-cat" id="pd-category-label">Producto</span>
+          <button type="button" class="CartDrawer-close" id="pd-close-btn" aria-label="Cerrar detalle del producto" autofocus>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </header>
+
+        <div class="ProductModal-body">
+          <div class="pd-main-grid">
+            <div class="pd-media">
+              <span class="pd-emoji" id="pd-emoji" role="img" aria-label="Producto">📦</span>
+              <div class="product-badges">
+                <span class="badge-discount" id="pd-discount-badge">-20%</span>
+                <span class="badge-tag" id="pd-tag-badge">Destacado</span>
+              </div>
+            </div>
+
+            <div class="pd-info">
+              <h2 class="pd-title" id="pd-title">Nombre del producto</h2>
+              <p class="pd-desc" id="pd-desc"></p>
+
+              <div class="pd-pricing-box">
+                <div class="price-row">
+                  <span class="price-current" id="pd-current-price">$0</span>
+                  <span class="price-old" id="pd-old-price">$0</span>
+                </div>
+                <p class="price-wholesale" id="pd-wholesale-info"></p>
+              </div>
+
+              <div class="pd-variants-wrap">
+                <span class="pd-label">Variante / Color:</span>
+                <div class="pd-variants" id="pd-variants"></div>
+              </div>
+
+              <div class="pd-qty-actions">
+                <div class="pd-qty-stepper" aria-label="Cantidad">
+                  <button type="button" id="pd-qty-dec" aria-label="Restar unidad">-</button>
+                  <span id="pd-qty-val">1</span>
+                  <button type="button" id="pd-qty-inc" aria-label="Sumar unidad">+</button>
+                </div>
+                <button type="button" class="btn-primary pd-add-btn" id="pd-add-to-cart-btn">Agregar al carrito</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bloque exclusivo para Sublimables a Pedido -->
+          <section class="pd-custom-box" id="pd-custom-section" hidden>
+            <div class="pd-custom-head">
+              <span class="pd-custom-badge">SUBLIMABLES A PEDIDO</span>
+              <h3>Enviá tu diseño y datos para cotizar o pedir</h3>
+              <p>Adjuntá tu logo, imagen o archivo de diseño junto con tus datos y te respondemos al instante por WhatsApp.</p>
+            </div>
+
+            <form id="pd-quote-form" class="account-form">
+              <div class="pd-upload-row">
+                <label class="pd-file-drop" for="pd-design-file">
+                  <span class="pd-file-icon" aria-hidden="true">📎</span>
+                  <span id="pd-file-label">Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)</span>
+                  <input
+                    type="file"
+                    id="pd-design-file"
+                    accept="image/*,.pdf,.svg,.ai,.cdr"
+                    class="visually-hidden"
+                  />
+                </label>
+
+                <div class="pd-design-preview" id="pd-design-preview-wrap" hidden>
+                  <img id="pd-design-preview-img" alt="Vista previa de tu diseño" />
+                  <span id="pd-design-file-meta"></span>
+                </div>
+              </div>
+
+              <label class="account-field">
+                <span>Indicaciones del diseño (ubicación, talles, cantidad, texto)</span>
+                <textarea
+                  id="pd-design-notes"
+                  rows="2"
+                  placeholder="Ej: Logo centrado en el frente 10x10 cm, 12 unidades surtidas..."
+                  required
+                ></textarea>
+              </label>
+
+              <div class="account-form-grid">
+                <label class="account-field">
+                  <span>Tu nombre</span>
+                  <input type="text" id="pd-client-name" required placeholder="Nombre y apellido" />
+                </label>
+                <label class="account-field">
+                  <span>Teléfono / WhatsApp</span>
+                  <input type="tel" id="pd-client-phone" required placeholder="11 5555-0000" />
+                </label>
+                <label class="account-field">
+                  <span>Email (opcional)</span>
+                  <input type="email" id="pd-client-email" placeholder="tu@email.com" />
+                </label>
+              </div>
+
+              <div class="pd-quote-actions">
+                <button type="submit" class="btn-whatsapp full-width" id="pd-send-quote-btn">
+                  Enviar Diseño y Cotizar por WhatsApp
+                </button>
+              </div>
+              <p class="account-success" id="pd-quote-feedback" role="status" aria-live="polite"></p>
+            </form>
+          </section>
+        </div>
+      </div>
+    </dialog>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

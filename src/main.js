@@ -474,7 +474,8 @@ function renderProducts() {
       </div>
     `;
 
-    card.querySelector('.wishlist-btn').addEventListener('click', () => {
+    card.querySelector('.wishlist-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
       if (state.wishlist.has(product.id)) state.wishlist.delete(product.id);
       else state.wishlist.add(product.id);
       document.getElementById('wishlist-count').textContent = String(state.wishlist.size);
@@ -485,8 +486,16 @@ function renderProducts() {
       renderProducts();
     });
 
+    card.querySelector('.product-media').addEventListener('click', () => {
+      openProductDetail(product);
+    });
+
+    card.querySelector('.product-title').addEventListener('click', () => {
+      openProductDetail(product);
+    });
+
     card.querySelector('.add-to-cart-btn').addEventListener('click', () => {
-      addToCart(product);
+      addToCart(product, 1, product.variants?.[0] || null);
     });
 
     fragment.appendChild(card);
@@ -498,10 +507,10 @@ function renderProducts() {
 /* =========================================================
    5. Shopping Cart Drawer (<dialog>) & WhatsApp Checkout
    ========================================================= */
-function addToCart(product) {
+function addToCart(product, qtyToAdd = 1) {
   const existing = state.cart.find((item) => item.product.id === product.id);
-  if (existing) existing.qty += 1;
-  else state.cart.push({ product, qty: 1 });
+  if (existing) existing.qty += qtyToAdd;
+  else state.cart.push({ product, qty: qtyToAdd });
   updateCartUI();
   openCartDrawer();
 }
@@ -895,6 +904,192 @@ function initAccountModal(mobileDrawerApi) {
 }
 
 /* =========================================================
+   5c. Individual Product View & Sublimables Quote Modal
+   ========================================================= */
+let activeDetailProduct = null;
+let activeDetailQty = 1;
+let activeDetailVariant = '';
+let activeDesignFileName = '';
+
+function updateProductDetailPricing() {
+  if (!activeDetailProduct) return;
+  const isWholesale = activeDetailQty >= activeDetailProduct.wholesaleMin;
+  const unitPrice = isWholesale ? activeDetailProduct.wholesalePrice : activeDetailProduct.price;
+  document.getElementById('pd-qty-val').textContent = String(activeDetailQty);
+  document.getElementById('pd-current-price').textContent = formatARS(unitPrice);
+  document.getElementById('pd-old-price').textContent = formatARS(activeDetailProduct.originalPrice);
+  document.getElementById('pd-wholesale-info').textContent = isWholesale
+    ? `✓ Precio mayorista aplicado (${activeDetailProduct.wholesaleMin}+ u.) · Subtotal: ${formatARS(unitPrice * activeDetailQty)}`
+    : `Mayorista (${activeDetailProduct.wholesaleMin}+ u.): ${formatARS(activeDetailProduct.wholesalePrice)} c/u`;
+}
+
+function openProductDetail(product) {
+  const modal = document.getElementById('product-detail-modal');
+  activeDetailProduct = product;
+  activeDetailQty = 1;
+  activeDetailVariant = product.variants?.[0] || 'Estándar';
+  activeDesignFileName = '';
+
+  const catName = CATEGORIES.find((c) => c.id === product.category)?.name || product.category;
+  document.getElementById('pd-category-label').textContent = `${catName} · ${product.subcategory}`;
+  document.getElementById('pd-emoji').textContent = product.emoji || '📦';
+  document.getElementById('pd-discount-badge').textContent = `-${product.discount}%`;
+  document.getElementById('pd-tag-badge').textContent = product.badge || 'Destacado';
+  document.getElementById('pd-title').textContent = product.title;
+  document.getElementById('pd-desc').textContent =
+    product.description || 'Producto disponible para venta minorista y mayorista con envíos a todo el país.';
+
+  // Variants
+  const variantsEl = document.getElementById('pd-variants');
+  variantsEl.innerHTML = '';
+  (product.variants || ['Único']).forEach((variant, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `pd-variant-pill ${idx === 0 ? 'is-selected' : ''}`;
+    btn.textContent = variant;
+    btn.addEventListener('click', () => {
+      activeDetailVariant = variant;
+      variantsEl.querySelectorAll('.pd-variant-pill').forEach((b) => b.classList.toggle('is-selected', b === btn));
+    });
+    variantsEl.appendChild(btn);
+  });
+
+  updateProductDetailPricing();
+
+  // Show custom design upload & quote section for sublimables a pedido
+  const isSublimable = product.category === 'sublimacion' || Boolean(product.customizable);
+  const customSection = document.getElementById('pd-custom-section');
+  customSection.hidden = !isSublimable;
+  document.getElementById('pd-quote-feedback').textContent = '';
+  document.getElementById('pd-design-notes').value = '';
+  document.getElementById('pd-design-file').value = '';
+  document.getElementById('pd-file-label').textContent = 'Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)';
+  document.getElementById('pd-design-preview-wrap').hidden = true;
+
+  if (isSublimable) {
+    const user = getCurrentUser();
+    document.getElementById('pd-client-name').value = user?.name || '';
+    document.getElementById('pd-client-phone').value = user?.phone || '';
+    document.getElementById('pd-client-email').value = user?.email || '';
+  }
+
+  modal.showModal();
+}
+
+function initProductDetailModal() {
+  const modal = document.getElementById('product-detail-modal');
+  document.getElementById('pd-close-btn')?.addEventListener('click', () => modal.close());
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) modal.close();
+  });
+
+  document.getElementById('pd-qty-dec')?.addEventListener('click', () => {
+    if (activeDetailQty > 1) {
+      activeDetailQty -= 1;
+      updateProductDetailPricing();
+    }
+  });
+
+  document.getElementById('pd-qty-inc')?.addEventListener('click', () => {
+    activeDetailQty += 1;
+    updateProductDetailPricing();
+  });
+
+  document.getElementById('pd-add-to-cart-btn')?.addEventListener('click', () => {
+    if (!activeDetailProduct) return;
+    modal.close();
+    addToCart(activeDetailProduct, activeDetailQty);
+  });
+
+  document.getElementById('pd-design-file')?.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    const previewWrap = document.getElementById('pd-design-preview-wrap');
+    const previewImg = document.getElementById('pd-design-preview-img');
+    const metaEl = document.getElementById('pd-design-file-meta');
+    const labelEl = document.getElementById('pd-file-label');
+
+    if (!file) {
+      activeDesignFileName = '';
+      previewWrap.hidden = true;
+      labelEl.textContent = 'Seleccionar diseño (PNG, JPG, SVG, PDF, AI, CDR)';
+      return;
+    }
+
+    activeDesignFileName = file.name;
+    const sizeKB = Math.max(1, Math.round(file.size / 1024));
+    labelEl.textContent = `Archivo seleccionado: ${file.name}`;
+    metaEl.textContent = `${file.name} (${sizeKB} KB)`;
+    previewWrap.hidden = false;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        previewImg.src = String(reader.result);
+        previewImg.hidden = false;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewImg.hidden = true;
+    }
+  });
+
+  document.getElementById('pd-quote-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!activeDetailProduct) return;
+
+    const clientName = document.getElementById('pd-client-name').value.trim();
+    const clientPhone = document.getElementById('pd-client-phone').value.trim();
+    const clientEmail = document.getElementById('pd-client-email').value.trim();
+    const notes = document.getElementById('pd-design-notes').value.trim();
+    const isWholesale = activeDetailQty >= activeDetailProduct.wholesaleMin;
+    const unitPrice = isWholesale ? activeDetailProduct.wholesalePrice : activeDetailProduct.price;
+    const total = unitPrice * activeDetailQty;
+
+    const currentUser = getCurrentUser();
+    const quoteId = `COT-${String(Math.floor(100000 + Math.random() * 900000))}`;
+
+    addOrder({
+      id: quoteId,
+      date: new Date().toISOString().slice(0, 16).replace('T', ' '),
+      userEmail: currentUser?.email || clientEmail || null,
+      customer: clientName,
+      phone: clientPhone,
+      itemsCount: activeDetailQty,
+      total,
+      paymentMethod: 'Cotización Sublimado',
+      status: 'Pendiente',
+      isCustomDesign: true,
+      designFileName: activeDesignFileName || 'Sin archivo adjunto (envía por WhatsApp)',
+      designNotes: notes,
+      items: [
+        {
+          title: `${activeDetailProduct.title} [${activeDetailVariant}] — Diseño: ${activeDesignFileName || 'A enviar'}`,
+          qty: activeDetailQty,
+          unitPrice
+        }
+      ]
+    });
+
+    const msgLines = [
+      `Hola Multirubro Expres! Quiero cotizar/pedir un producto sublimable (${quoteId}):`,
+      `- Producto: ${activeDetailProduct.title}`,
+      `- Variante: ${activeDetailVariant}`,
+      `- Cantidad: ${activeDetailQty} u. (${formatARS(total)} aprox.)`,
+      `- Archivo de diseño: ${activeDesignFileName || 'Lo envío por este chat'}`,
+      `- Indicaciones: ${notes}`,
+      `- Cliente: ${clientName} | Tel: ${clientPhone}${clientEmail ? ` | Email: ${clientEmail}` : ''}`
+    ];
+
+    const waNum = (SETTINGS.whatsappNumber || '5491100000000').replace(/\D/g, '');
+    const waUrl = `https://wa.me/${waNum}?text=${encodeURIComponent(msgLines.join('\n'))}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+
+    document.getElementById('pd-quote-feedback').textContent =
+      `✓ Cotización ${quoteId} registrada. Si no se abrió WhatsApp automáticamente, revisá las ventanas emergentes.`;
+  });
+}
+
+/* =========================================================
    6. Bootstrap App
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -906,6 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initCategories(mobileDrawerApi);
   initCartDrawer();
   initAccountModal(mobileDrawerApi);
+  initProductDetailModal();
   renderCategoryPills();
   renderProducts();
   updateCartUI();

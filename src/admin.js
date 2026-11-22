@@ -303,10 +303,18 @@ function openOrderModal(order) {
   const modal = document.getElementById('order-modal');
   const body = document.getElementById('order-modal-body');
   document.getElementById('order-modal-title').textContent = `Pedido ${order.id}`;
+  const addr = order.shippingAddress?.street
+    ? `<p><strong>Dirección de envío:</strong> ${order.shippingAddress.street}, ${order.shippingAddress.city}${order.shippingAddress.postalCode ? ` (CP ${order.shippingAddress.postalCode})` : ''}</p>`
+    : '';
+  const customInfo = order.isCustomDesign
+    ? `<p><strong>Diseño adjunto:</strong> ${order.designFileName || 'No especificado'}</p><p><strong>Indicaciones:</strong> ${order.designNotes || '-'}</p>`
+    : '';
   body.innerHTML = `
     <p><strong>Cliente:</strong> ${order.customer} (${order.phone})</p>
+    ${addr}
     <p><strong>Fecha:</strong> ${order.date} · <strong>Pago:</strong> ${order.paymentMethod}</p>
     <p><strong>Estado:</strong> ${order.status}</p>
+    ${customInfo}
     <hr />
     <ul>
       ${order.items.map((i) => `<li>${i.qty}x ${i.title} — ${formatARS(i.unitPrice)} c/u</li>`).join('')}
