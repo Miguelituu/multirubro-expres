@@ -1111,9 +1111,20 @@ let pageDesignFileName = '';
 function showHomeView() {
   document.getElementById('home-view').hidden = false;
   document.getElementById('product-page-view').hidden = true;
-  if (window.location.hash.startsWith('#/producto/')) {
+  document.getElementById('catalog-page-view').hidden = true;
+  document.getElementById('nav-home-link')?.setAttribute('aria-current', 'page');
+  document.getElementById('nav-catalog-link')?.removeAttribute('aria-current');
+  if (window.location.hash.startsWith('#/producto/') || window.location.hash.startsWith('#/catalogo')) {
     history.pushState(null, '', '#/');
   }
+}
+
+function navigateToCatalog(categoryId = null) {
+  if (categoryId) {
+    state.category = categoryId;
+    state.subcategory = null;
+  }
+  window.location.hash = '#/catalogo';
 }
 
 function navigateToProduct(productId) {
@@ -1203,18 +1214,89 @@ function renderProductPage(product) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+function renderCatalogPage() {
+  document.getElementById('home-view').hidden = true;
+  document.getElementById('product-page-view').hidden = true;
+  document.getElementById('catalog-page-view').hidden = false;
+  document.getElementById('nav-home-link')?.removeAttribute('aria-current');
+  document.getElementById('nav-catalog-link')?.setAttribute('aria-current', 'page');
+
+  const catList = document.getElementById('cp-cat-list');
+  catList.innerHTML = '';
+
+  const allLi = document.createElement('li');
+  const allBtn = document.createElement('button');
+  allBtn.type = 'button';
+  allBtn.className = `cp-cat-btn ${state.category === 'all' ? 'is-active' : ''}`;
+  allBtn.textContent = `Todas (${PRODUCTS.length})`;
+  allBtn.addEventListener('click', () => {
+    state.category = 'all';
+    state.subcategory = null;
+    renderCatalogPage();
+  });
+  allLi.appendChild(allBtn);
+  catList.appendChild(allLi);
+
+  CATEGORIES.forEach((cat) => {
+    const count = PRODUCTS.filter((p) => p.category === cat.id).length;
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `cp-cat-btn ${state.category === cat.id ? 'is-active' : ''}`;
+    btn.textContent = `${cat.name} (${count})`;
+    btn.addEventListener('click', () => {
+      state.category = cat.id;
+      state.subcategory = null;
+      renderCatalogPage();
+    });
+    li.appendChild(btn);
+    catList.appendChild(li);
+  });
+
+  document.getElementById('cp-search-input').value = state.search;
+  document.getElementById('cp-sort-select').value = state.sort;
+  document.getElementById('cp-wholesale-toggle').checked = state.wholesaleView;
+  document.getElementById('cp-offers-only').checked = state.onlyOffers;
+
+  const items = getFilteredProducts();
+  const grid = document.getElementById('cp-products-grid');
+  const empty = document.getElementById('cp-empty-state');
+  document.getElementById('cp-count').textContent = `Mostrando ${items.length} producto${items.length === 1 ? '' : 's'}`;
+
+  grid.innerHTML = '';
+  if (items.length === 0) {
+    empty.hidden = false;
+  } else {
+    empty.hidden = true;
+    const frag = document.createDocumentFragment();
+    items.forEach((p) => frag.appendChild(createProductCard(p)));
+    grid.appendChild(frag);
+  }
+}
+
 function handleRoute() {
   const hash = window.location.hash;
   if (hash.startsWith('#/producto/')) {
     const id = hash.replace('#/producto/', '').trim();
     const product = PRODUCTS.find((p) => p.id === id);
     if (product) {
+      document.getElementById('catalog-page-view').hidden = true;
+      document.getElementById('nav-home-link')?.removeAttribute('aria-current');
+      document.getElementById('nav-catalog-link')?.setAttribute('aria-current', 'page');
       renderProductPage(product);
       return;
     }
   }
+  if (hash.startsWith('#/catalogo')) {
+    renderCatalogPage();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
   document.getElementById('home-view').hidden = false;
   document.getElementById('product-page-view').hidden = true;
+  document.getElementById('catalog-page-view').hidden = true;
+  document.getElementById('nav-home-link')?.setAttribute('aria-current', 'page');
+  document.getElementById('nav-catalog-link')?.removeAttribute('aria-current');
 }
 
 function initProductPageView() {
@@ -1344,6 +1426,104 @@ function initProductPageView() {
 }
 
 /* =========================================================
+   5e. Home Categories, Catalog Page, Theme Toggle & Floating Actions
+   ========================================================= */
+function renderHomeCategories() {
+  const grid = document.getElementById('home-categories-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  CATEGORIES.forEach((cat) => {
+    const count = PRODUCTS.filter((p) => p.category === cat.id).length;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'home-cat-card';
+    btn.innerHTML = `
+      <span class="home-cat-icon">${ICONS[cat.icon] || ''}</span>
+      <div>
+        <strong>${cat.name}</strong>
+        <span>${cat.featuredTag} · ${count} prod.</span>
+      </div>
+    `;
+    btn.addEventListener('click', () => navigateToCatalog(cat.id));
+    grid.appendChild(btn);
+  });
+}
+
+function initCatalogPageView() {
+  document.getElementById('cp-search-input')?.addEventListener('input', (e) => {
+    state.search = e.target.value;
+    renderCatalogPage();
+  });
+  document.getElementById('cp-sort-select')?.addEventListener('change', (e) => {
+    state.sort = e.target.value;
+    renderCatalogPage();
+  });
+  document.getElementById('cp-wholesale-toggle')?.addEventListener('change', (e) => {
+    state.wholesaleView = e.target.checked;
+    renderCatalogPage();
+  });
+  document.getElementById('cp-offers-only')?.addEventListener('change', (e) => {
+    state.onlyOffers = e.target.checked;
+    renderCatalogPage();
+  });
+  document.getElementById('cp-reset-btn')?.addEventListener('click', () => {
+    state.category = 'all';
+    state.subcategory = null;
+    state.search = '';
+    state.onlyOffers = false;
+    state.onlyWishlist = false;
+    renderCatalogPage();
+  });
+}
+
+function initThemeToggle() {
+  const btn = document.getElementById('theme-toggle-btn');
+  const icon = document.getElementById('theme-toggle-icon');
+  const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function applyTheme(theme) {
+    document.documentElement.dataset.theme = theme;
+    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
+  const saved = localStorage.getItem('mr_expres_theme');
+  applyTheme(saved || (media.matches ? 'dark' : 'light'));
+
+  media.addEventListener('change', (e) => {
+    if (!localStorage.getItem('mr_expres_theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+
+  btn?.addEventListener('click', () => {
+    const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('mr_expres_theme', next);
+    applyTheme(next);
+  });
+}
+
+function initFloatingActions() {
+  const waBtn = document.getElementById('floating-whatsapp-btn');
+  const topBtn = document.getElementById('scroll-top-btn');
+  const waNum = (SETTINGS.whatsappNumber || '5491100000000').replace(/\D/g, '');
+  if (waBtn) {
+    waBtn.href = `https://wa.me/${waNum}?text=${encodeURIComponent('Hola Multirubro Expres! Quiero hacer una consulta.')}`;
+  }
+
+  function updateScrollTopVisibility() {
+    if (!topBtn) return;
+    topBtn.hidden = window.scrollY < 320;
+  }
+
+  window.addEventListener('scroll', updateScrollTopVisibility, { passive: true });
+  updateScrollTopVisibility();
+
+  topBtn?.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/* =========================================================
    6. Bootstrap App
    ========================================================= */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1357,6 +1537,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initAccountModal(mobileDrawerApi);
   initProductDetailModal();
   initProductPageView();
+  initCatalogPageView();
+  initThemeToggle();
+  initFloatingActions();
+  renderHomeCategories();
   renderCategoryPills();
   renderProducts();
   updateCartUI();

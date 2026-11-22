@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>Multirubro Expres | Tienda Mayorista y Minorista</title>
     <meta
       name="description"
@@ -113,6 +114,16 @@
               <span class="action-badge" id="cart-count">0</span>
             </button>
 
+            <button
+              type="button"
+              id="theme-toggle-btn"
+              class="action-circle-btn"
+              aria-label="Cambiar modo claro u oscuro"
+              title="Modo claro / oscuro"
+            >
+              <span id="theme-toggle-icon" aria-hidden="true">🌙</span>
+            </button>
+
             <a
               href="https://www.instagram.com/multirubroexpres/"
               target="_blank"
@@ -170,11 +181,11 @@
 
           <nav class="primary-nav" aria-label="Navegación principal">
             <ul class="primary-nav-list">
-              <li><a href="#inicio" aria-current="page">Inicio</a></li>
-              <li><a href="#catalogo">Productos</a></li>
+              <li><a href="#/" id="nav-home-link" aria-current="page">Inicio</a></li>
+              <li><a href="#/catalogo" id="nav-catalog-link">Catálogo</a></li>
               <li><a href="#mayorista">Venta Mayorista</a></li>
-              <li><a href="#catalogo" data-filter-offer="true">Ofertas Flash</a></li>
-              <li><a href="#beneficios">Envíos</a></li>
+              <li><a href="#/catalogo" data-filter-offer="true">Ofertas Flash</a></li>
+              <li><a href="#como-comprar">Cómo Comprar</a></li>
               <li><a href="#contacto">Contacto</a></li>
             </ul>
           </nav>
@@ -466,6 +477,52 @@
             <p>No encontramos productos que coincidan con tu búsqueda.</p>
             <button type="button" class="btn-primary" id="reset-filters-btn">Ver todos los productos</button>
           </div>
+
+          <div class="catalog-more-cta">
+            <a href="#/catalogo" class="btn-outline-dark">Ver catálogo completo con filtros avanzados →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sección Explorar por Categoría -->
+      <section class="home-categories-section">
+        <div class="container">
+          <div class="section-head-center">
+            <span class="section-kicker">RUBROS PRINCIPALES</span>
+            <h2 class="section-title">Explorá por Categoría</h2>
+          </div>
+          <div class="home-categories-grid" id="home-categories-grid"></div>
+        </div>
+      </section>
+
+      <!-- Sección Sublimables a Pedido -->
+      <section class="sublimation-showcase-section">
+        <div class="container sublimation-showcase-card">
+          <div class="sublimation-copy">
+            <span class="pd-custom-badge">SERVICIO EXCLUSIVO · SUBLIMACIÓN A PEDIDO</span>
+            <h2>Personalizamos tazas, gorras y remeras con tu diseño</h2>
+            <p>
+              ¿Tenés un emprendimiento, evento o egresados? Elegí el producto sublimable, adjuntá tu logo o diseño desde la ficha del producto y recibí tu cotización al instante por WhatsApp.
+            </p>
+            <div class="slide-actions">
+              <button type="button" class="btn-primary" data-jump-category="sublimacion">Ver Sublimables a Pedido</button>
+              <a href="#/producto/prod-13" class="btn-outline-dark">Probar Personalización →</a>
+            </div>
+          </div>
+          <div class="sublimation-highlights">
+            <div class="sub-highlight-item">
+              <strong>🎨 Full Color HD</strong>
+              <span>Estampado que no se despega ni destiñe</span>
+            </div>
+            <div class="sub-highlight-item">
+              <strong>📎 Subí tu archivo</strong>
+              <span>PNG, JPG, SVG, PDF, AI o CDR</span>
+            </div>
+            <div class="sub-highlight-item">
+              <strong>📦 Por unidad o mayorista</strong>
+              <span>Precios especiales desde 3 o 6 unidades</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -491,7 +548,122 @@
           </div>
         </div>
       </section>
+
+      <!-- Sección Cómo Comprar & Preguntas Frecuentes -->
+      <section class="how-faq-section" id="como-comprar">
+        <div class="container how-faq-grid">
+          <div>
+            <span class="section-kicker">SIMPLE Y RÁPIDO</span>
+            <h2 class="section-title">¿Cómo comprar en Multirubro Expres?</h2>
+            <ol class="steps-list">
+              <li>
+                <span class="step-num">1</span>
+                <div>
+                  <strong>Elegí tus productos</strong>
+                  <p>Navegá por categoría o buscá lo que necesitás. Llevando 3+ unidades accedés al precio mayorista.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">2</span>
+                <div>
+                  <strong>Armá tu carrito o enviá tu diseño</strong>
+                  <p>Cargá tus datos en Mi Cuenta para guardar tu dirección de envío predeterminada.</p>
+                </div>
+              </li>
+              <li>
+                <span class="step-num">3</span>
+                <div>
+                  <strong>Confirmá por WhatsApp y recibilo</strong>
+                  <p>Coordinamos pago (Transferencia, Mercado Pago o Efectivo) y despachamos en 24 hs a todo el país.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div>
+            <span class="section-kicker">DUDAS FRECUENTES</span>
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <div class="faq-list">
+              <details class="faq-item" open>
+                <summary>¿Hay monto mínimo de compra mayorista?</summary>
+                <p>No exigimos compra mínima obligatoria en dinero. Podés acceder al precio mayorista llevando desde 3 unidades (o 6 en gorras) por producto.</p>
+              </details>
+              <details class="faq-item">
+                <summary>¿Hacen envíos a todo el país?</summary>
+                <p>Sí, despachamos en 24 hs hábiles por Correo Argentino, Andreani, expresos al interior y moto mensajería en el día para CABA y GBA.</p>
+              </details>
+              <details class="faq-item">
+                <summary>¿Cómo envío mi diseño para productos sublimables?</summary>
+                <p>Entrá a cualquier producto de la categoría Sublimación, adjuntá tu archivo (PNG, JPG, PDF, SVG, AI o CDR) y tocá "Enviar Diseño y Cotizar por WhatsApp".</p>
+              </details>
+              <details class="faq-item">
+                <summary>¿Qué medios de pago aceptan?</summary>
+                <p>Aceptamos transferencia bancaria, Mercado Pago, tarjetas y efectivo al retirar o por moto mensajería.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
       </div>
+
+      <!-- Página Dedicada de Catálogo Completo (SPA Route: #/catalogo) -->
+      <section id="catalog-page-view" class="catalog-page-section" hidden aria-labelledby="cp-title">
+        <div class="container">
+          <nav class="pp-breadcrumb" aria-label="Ruta de navegación">
+            <a href="#/" class="pp-back-btn">← Volver al inicio</a>
+            <span class="pp-crumb-sep" aria-hidden="true">/</span>
+            <span class="pp-crumb-current">Catálogo Completo</span>
+          </nav>
+
+          <div class="cp-header">
+            <div>
+              <span class="section-kicker">TODOS LOS RUBROS</span>
+              <h1 class="section-title" id="cp-title">Catálogo Completo</h1>
+              <p class="cp-count" id="cp-count">Mostrando todos los productos</p>
+            </div>
+
+            <div class="catalog-controls">
+              <label class="wholesale-toggle">
+                <input type="checkbox" id="cp-wholesale-toggle" />
+                <span>Ver precios mayoristas</span>
+              </label>
+
+              <div class="sort-wrapper">
+                <label class="visually-hidden" for="cp-sort-select">Ordenar catálogo</label>
+                <select id="cp-sort-select">
+                  <option value="featured">Ordenar: Destacados</option>
+                  <option value="price-asc">Menor precio</option>
+                  <option value="price-desc">Mayor precio</option>
+                  <option value="discount">Mayor descuento</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="cp-layout">
+            <aside class="cp-filters-panel" aria-label="Filtros del catálogo">
+              <label class="cp-search-box">
+                <span class="visually-hidden">Buscar en catálogo</span>
+                <input type="search" id="cp-search-input" placeholder="Buscar producto..." />
+              </label>
+              <h3>Categorías</h3>
+              <ul class="cp-cat-list" id="cp-cat-list"></ul>
+              <label class="cp-offer-check">
+                <input type="checkbox" id="cp-offers-only" />
+                <span>Solo Ofertas (20%+ OFF)</span>
+              </label>
+            </aside>
+
+            <div>
+              <div class="products-grid" id="cp-products-grid"></div>
+              <div class="empty-state" id="cp-empty-state" hidden>
+                <p>No hay productos con esos filtros.</p>
+                <button type="button" class="btn-primary" id="cp-reset-btn">Limpiar filtros</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Vista Completa de Producto (SPA Route: #/producto/<id>) -->
       <section id="product-page-view" class="product-page-section" hidden aria-labelledby="pp-title">
@@ -961,6 +1133,36 @@
         </div>
       </div>
     </dialog>
+
+    <!-- Botones Flotantes: WhatsApp + Ir Arriba -->
+    <div class="floating-actions" aria-label="Accesos rápidos">
+      <button
+        type="button"
+        id="scroll-top-btn"
+        class="float-btn float-btn--top"
+        aria-label="Volver arriba"
+        title="Volver arriba"
+        hidden
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="18 15 12 9 6 15"></polyline>
+        </svg>
+      </button>
+
+      <a
+        id="floating-whatsapp-btn"
+        href="https://wa.me/5491100000000?text=Hola%20Multirubro%20Expres!%20Quiero%20hacer%20una%20consulta."
+        target="_blank"
+        rel="noopener noreferrer"
+        class="float-btn float-btn--wa"
+        aria-label="Consultar por WhatsApp"
+        title="Escribinos por WhatsApp"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12.03 2C6.51 2 2.04 6.47 2.04 11.99c0 1.76.46 3.48 1.34 5L2 22l5.15-1.35a9.95 9.95 0 0 0 4.88 1.27h.01c5.52 0 9.99-4.47 9.99-9.99C22.03 6.47 17.55 2 12.03 2zm5.82 14.19c-.25.7-1.45 1.34-2.01 1.42-.52.08-1.18.11-1.9-.12-.44-.14-1-.33-1.72-.64-3.03-1.31-5.01-4.35-5.16-4.55-.15-.2-1.23-1.64-1.23-3.13 0-1.49.78-2.22 1.06-2.52.28-.3.61-.38.81-.38.2 0 .41.01.59.01.19 0 .45-.07.7.53.26.62.88 2.15.96 2.3.08.15.13.33.03.53-.1.2-.15.33-.3.5-.15.18-.32.4-.45.54-.15.15-.31.31-.13.62.18.3.79 1.3 1.7 2.11 1.17 1.04 2.15 1.36 2.46 1.51.3.15.48.13.66-.08.18-.2.76-.88.96-1.18.2-.3.41-.25.68-.15.28.1 1.76.83 2.06.98.3.15.5.23.58.35.07.13.07.75-.18 1.45z"/>
+        </svg>
+      </a>
+    </div>
 
     <script type="module" src="/src/main.js"></script>
   </body>
